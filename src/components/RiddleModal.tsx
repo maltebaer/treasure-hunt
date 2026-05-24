@@ -1,18 +1,8 @@
 import { useState } from "react";
-
-export type Option = { emoji: string; label: string; correct: boolean };
-
-export type RiddleStation = {
-  id: number;
-  childName: string;
-  scarfColorLabel: string;
-  direction: string;
-  question: string;
-  options: Option[];
-};
+import type { Option, Station } from "../data/stations";
 
 type Props = {
-  station: RiddleStation;
+  station: Station;
   onClose: () => void;
   onSolved: (id: number) => void;
 };
@@ -77,6 +67,7 @@ export default function RiddleModal({ station, onClose, onSolved }: Props) {
               Geh nach <strong>{station.direction}</strong>
             </p>
             <p>Suche das {station.scarfColorLabel} Tuch!</p>
+            {station.isTreasure && <p>Dort liegt der Schatz!</p>}
             <button type="button" onClick={handleFound}>
               Tuch gefunden, weiter
             </button>

@@ -5,14 +5,25 @@ import MapScreen from "./MapScreen";
 
 const STORAGE_KEY = "treasure-hunt:progress";
 
+const CORRECT_OPTION_LABEL: Record<number, RegExp> = {
+  1: /Biene/i,
+  2: /Orange/i,
+  3: /Rotkäppchen/i,
+  4: /Acht/i,
+  5: /Kuh/i,
+  6: /Äpfel/i,
+  7: /Schatz/i,
+};
+
 async function solveStation(
   user: ReturnType<typeof userEvent.setup>,
   markerId: number,
-  correctOptionLabel: RegExp,
 ) {
   await user.click(screen.getByTestId(`station-marker-${markerId}`));
   const dialog = screen.getByRole("dialog");
-  await user.click(within(dialog).getByRole("button", { name: correctOptionLabel }));
+  await user.click(
+    within(dialog).getByRole("button", { name: CORRECT_OPTION_LABEL[markerId] }),
+  );
   await user.click(
     within(dialog).getByRole("button", { name: /Tuch gefunden/i }),
   );
@@ -64,7 +75,7 @@ describe("MapScreen", () => {
   it("activates marker 2 (Lina) after marker 1 is solved", async () => {
     const user = userEvent.setup();
     render(<MapScreen />);
-    await solveStation(user, 1, /Biene/i);
+    await solveStation(user, 1);
     expect(screen.getByTestId("station-marker-1")).toHaveAttribute(
       "data-state",
       "solved",
@@ -74,55 +85,41 @@ describe("MapScreen", () => {
       "active",
     );
     expect(screen.getByTestId("station-marker-2")).toBeEnabled();
-    for (let id = 3; id <= 7; id++) {
-      expect(screen.getByTestId(`station-marker-${id}`)).toBeDisabled();
-    }
   });
 
-  it("opens Lina's riddle when marker 2 is tapped after station 1 solved", async () => {
+  it("activates marker 3 (Friedi) after marker 2 is solved", async () => {
     localStorage.setItem(
       STORAGE_KEY,
       JSON.stringify({ solvedStations: [1] }),
     );
     const user = userEvent.setup();
     render(<MapScreen />);
-    await user.click(screen.getByTestId("station-marker-2"));
-    const dialog = screen.getByRole("dialog");
-    expect(within(dialog).getByText(/Rot und Gelb/i)).toBeInTheDocument();
-  });
-
-  it("marks marker 2 solved and keeps marker 3 locked (no riddle yet)", async () => {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ solvedStations: [1] }),
-    );
-    const user = userEvent.setup();
-    render(<MapScreen />);
-    await solveStation(user, 2, /Orange/i);
-    expect(screen.getByTestId("station-marker-2")).toHaveAttribute(
-      "data-state",
-      "solved",
-    );
+    await solveStation(user, 2);
     expect(screen.getByTestId("station-marker-3")).toHaveAttribute(
-      "data-state",
-      "locked",
-    );
-    expect(screen.getByTestId("station-marker-3")).toBeDisabled();
-  });
-
-  it("restores progress on mount", () => {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ solvedStations: [1] }),
-    );
-    render(<MapScreen />);
-    expect(screen.getByTestId("station-marker-1")).toHaveAttribute(
-      "data-state",
-      "solved",
-    );
-    expect(screen.getByTestId("station-marker-2")).toHaveAttribute(
       "data-state",
       "active",
     );
+    expect(screen.getByTestId("station-marker-3")).toBeEnabled();
+  });
+
+  it("plays through all seven stations and reveals the treasure placeholder", async () => {
+    const user = userEvent.setup();
+    render(<MapScreen />);
+    for (let id = 1; id <= 7; id++) {
+      await solveStation(user, id);
+    }
+    expect(screen.getByTestId("treasure-placeholder")).toBeInTheDocument();
+    expect(screen.getByText(/Du hast den Schatz gefunden/i)).toBeInTheDocument();
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}");
+    expect(stored.solvedStations).toEqual([1, 2, 3, 4, 5, 6, 7]);
+  });
+
+  it("shows the treasure placeholder on mount when all stations are solved", () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ solvedStations: [1, 2, 3, 4, 5, 6, 7] }),
+    );
+    render(<MapScreen />);
+    expect(screen.getByTestId("treasure-placeholder")).toBeInTheDocument();
   });
 });
