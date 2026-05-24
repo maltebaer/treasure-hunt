@@ -11,13 +11,21 @@ type Props = {
 
 export default function RiddleModal({ station, onClose, onSolved }: Props) {
   const [answeredCorrectly, setAnsweredCorrectly] = useState(false);
+  const [shakingLabel, setShakingLabel] = useState<string | null>(null);
 
   useEffect(() => {
     if (answeredCorrectly) burst();
   }, [answeredCorrectly]);
 
   function handleAnswer(option: Option) {
-    if (option.correct) setAnsweredCorrectly(true);
+    if (option.correct) {
+      setAnsweredCorrectly(true);
+      return;
+    }
+    setShakingLabel(option.label);
+    setTimeout(() => {
+      setShakingLabel((prev) => (prev === option.label ? null : prev));
+    }, 400);
   }
 
   function handleFound() {
@@ -108,30 +116,34 @@ export default function RiddleModal({ station, onClose, onSolved }: Props) {
                 justifyContent: "center",
               }}
             >
-              {station.options.map((option) => (
-                <button
-                  key={option.label}
-                  type="button"
-                  onClick={() => handleAnswer(option)}
-                  style={{
-                    fontSize: "1.25rem",
-                    padding: "1rem 1.5rem",
-                    borderRadius: "0.75rem",
-                    border: "2px solid #ccc",
-                    background: "white",
-                    cursor: "pointer",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                  }}
-                >
-                  <span aria-hidden="true" style={{ fontSize: "2.5rem" }}>
-                    {option.emoji}
-                  </span>
-                  <span>{option.label}</span>
-                </button>
-              ))}
+              {station.options.map((option) => {
+                const isShaking = shakingLabel === option.label;
+                return (
+                  <button
+                    key={option.label}
+                    type="button"
+                    onClick={() => handleAnswer(option)}
+                    className={isShaking ? "shaking" : undefined}
+                    style={{
+                      fontSize: "1.25rem",
+                      padding: "1rem 1.5rem",
+                      borderRadius: "0.75rem",
+                      border: `2px solid ${isShaking ? "#e53935" : "#ccc"}`,
+                      background: isShaking ? "#ffebee" : "white",
+                      cursor: "pointer",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                    }}
+                  >
+                    <span aria-hidden="true" style={{ fontSize: "2.5rem" }}>
+                      {option.emoji}
+                    </span>
+                    <span>{option.label}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}

@@ -1,4 +1,4 @@
-import { screen, within } from "@testing-library/react";
+import { act, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import MapScreen from "./MapScreen";
@@ -128,6 +128,36 @@ describe("MapScreen", () => {
       within(dialog).getByRole("button", { name: /Marienkäfer/i }),
     );
     expect(burst).not.toHaveBeenCalled();
+  });
+
+  it("adds 'shaking' class to a wrong button and removes it after ~400ms", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    renderWithProgress(<MapScreen />);
+    await user.click(screen.getByTestId("station-marker-1"));
+    const dialog = screen.getByRole("dialog");
+    const wrong = within(dialog).getByRole("button", {
+      name: /Marienkäfer/i,
+    });
+    await user.click(wrong);
+    expect(wrong.className).toMatch(/shaking/);
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
+    expect(wrong.className).not.toMatch(/shaking/);
+    vi.useRealTimers();
+  });
+
+  it("does not add 'shaking' on a correct answer (success view replaces the buttons)", async () => {
+    const user = userEvent.setup();
+    renderWithProgress(<MapScreen />);
+    await user.click(screen.getByTestId("station-marker-1"));
+    const dialog = screen.getByRole("dialog");
+    await user.click(within(dialog).getByRole("button", { name: /Biene/i }));
+    expect(
+      within(dialog).queryByRole("button", { name: /Biene/i }),
+    ).not.toBeInTheDocument();
+    expect(within(dialog).getByTestId("direction-label")).toBeInTheDocument();
   });
 
   it("renders no direction arrow before any station is solved", () => {
