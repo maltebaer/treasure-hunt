@@ -1,47 +1,38 @@
 import { useState } from "react";
 
-type Option = { emoji: string; label: string; correct: boolean };
+export type Option = { emoji: string; label: string; correct: boolean };
 
-const FINJA_STATION = {
-  id: 1,
-  childName: "Finja",
-  scarfColorLabel: "rote",
-  direction: "NORDWEST",
-  question:
-    "Ich bin gelb-schwarz gestreift, mache Honig und summe. Wer bin ich?",
-  options: [
-    { emoji: "🐝", label: "Biene", correct: true },
-    { emoji: "🐞", label: "Marienkäfer", correct: false },
-    { emoji: "🐛", label: "Raupe", correct: false },
-  ] as Option[],
+export type RiddleStation = {
+  id: number;
+  childName: string;
+  scarfColorLabel: string;
+  direction: string;
+  question: string;
+  options: Option[];
 };
 
 type Props = {
-  stationId: number;
+  station: RiddleStation;
   onClose: () => void;
   onSolved: (id: number) => void;
 };
 
-export default function RiddleModal({ stationId, onClose, onSolved }: Props) {
+export default function RiddleModal({ station, onClose, onSolved }: Props) {
   const [answeredCorrectly, setAnsweredCorrectly] = useState(false);
-
-  if (stationId !== FINJA_STATION.id) {
-    return null;
-  }
 
   function handleAnswer(option: Option) {
     if (option.correct) setAnsweredCorrectly(true);
   }
 
   function handleFound() {
-    onSolved(FINJA_STATION.id);
+    onSolved(station.id);
   }
 
   return (
     <div
       role="dialog"
       aria-modal="true"
-      aria-label={`Station ${FINJA_STATION.id} · ${FINJA_STATION.childName}`}
+      aria-label={`Station ${station.id} · ${station.childName}`}
       style={{
         position: "fixed",
         inset: 0,
@@ -83,9 +74,9 @@ export default function RiddleModal({ stationId, onClose, onSolved }: Props) {
           <div>
             <h1>RICHTIG!</h1>
             <p>
-              Geh nach <strong>{FINJA_STATION.direction}</strong>
+              Geh nach <strong>{station.direction}</strong>
             </p>
-            <p>Suche das {FINJA_STATION.scarfColorLabel} Tuch!</p>
+            <p>Suche das {station.scarfColorLabel} Tuch!</p>
             <button type="button" onClick={handleFound}>
               Tuch gefunden, weiter
             </button>
@@ -93,9 +84,9 @@ export default function RiddleModal({ stationId, onClose, onSolved }: Props) {
         ) : (
           <div>
             <header>
-              Station {FINJA_STATION.id} · {FINJA_STATION.childName}
+              Station {station.id} · {station.childName}
             </header>
-            <h1>{FINJA_STATION.question}</h1>
+            <h1>{station.question}</h1>
             <div
               style={{
                 display: "flex",
@@ -104,7 +95,7 @@ export default function RiddleModal({ stationId, onClose, onSolved }: Props) {
                 justifyContent: "center",
               }}
             >
-              {FINJA_STATION.options.map((option) => (
+              {station.options.map((option) => (
                 <button
                   key={option.label}
                   type="button"

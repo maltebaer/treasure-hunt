@@ -1,7 +1,10 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { loadProgress, saveProgress } from "./progress";
+import { act, renderHook } from "@testing-library/react";
+import { loadProgress, saveProgress, useProgress } from "./progress";
 
-describe("progress", () => {
+const STORAGE_KEY = "treasure-hunt:progress";
+
+describe("loadProgress / saveProgress", () => {
   beforeEach(() => {
     localStorage.clear();
   });
@@ -16,12 +19,63 @@ describe("progress", () => {
   });
 
   it("returns default on invalid JSON", () => {
-    localStorage.setItem("treasure-hunt:progress", "{not json");
+    localStorage.setItem(STORAGE_KEY, "{not json");
     expect(loadProgress()).toEqual({ solvedStations: [] });
   });
 
   it("returns default when solvedStations is missing or wrong type", () => {
-    localStorage.setItem("treasure-hunt:progress", '{"foo":"bar"}');
+    localStorage.setItem(STORAGE_KEY, '{"foo":"bar"}');
     expect(loadProgress()).toEqual({ solvedStations: [] });
+  });
+});
+
+describe("useProgress", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("starts with empty solvedStations and currentStation === 1", () => {
+    const { result } = renderHook(() => useProgress());
+    expect(result.current.solvedStations).toEqual([]);
+    expect(result.current.currentStation).toBe(1);
+  });
+
+  it("solve(1) updates solvedStations and currentStation === 2", () => {
+    const { result } = renderHook(() => useProgress());
+    act(() => result.current.solve(1));
+    expect(result.current.solvedStations).toEqual([1]);
+    expect(result.current.currentStation).toBe(2);
+  });
+
+  it("hydrates currentStation from existing localStorage progress", () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ solvedStations: [1] }),
+    );
+    const { result } = renderHook(() => useProgress());
+    expect(result.current.currentStation).toBe(2);
+  });
+
+  it("returns currentStation === null when all 7 are solved", () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ solvedStations: [1, 2, 3, 4, 5, 6, 7] }),
+    );
+    const { result } = renderHook(() => useProgress());
+    expect(result.current.currentStation).toBeNull();
+  });
+
+  it("solve persists to localStorage", () => {
+    const { result } = renderHook(() => useProgress());
+    act(() => result.current.solve(1));
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}");
+    expect(stored.solvedStations).toEqual([1]);
+  });
+
+  it("solve is idempotent", () => {
+    const { result } = renderHook(() => useProgress());
+    act(() => result.current.solve(1));
+    act(() => result.current.solve(1));
+    expect(result.current.solvedStations).toEqual([1]);
   });
 });
