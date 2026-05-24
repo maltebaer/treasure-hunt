@@ -49,6 +49,13 @@ describe("MapScreen", () => {
     }
   });
 
+  it("renders the treasure-map background labelled 'Schatzkarte'", () => {
+    renderWithProgress(<MapScreen />);
+    expect(
+      screen.getByRole("img", { name: /Schatzkarte/i }),
+    ).toBeInTheDocument();
+  });
+
   it("enables only marker 1 and disables markers 2-7 at the start", () => {
     renderWithProgress(<MapScreen />);
     expect(screen.getByTestId("station-marker-1")).toBeEnabled();

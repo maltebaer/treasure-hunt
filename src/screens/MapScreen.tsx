@@ -3,6 +3,7 @@ import StationMarker, {
   type MarkerState,
 } from "../components/StationMarker";
 import RiddleModal from "../components/RiddleModal";
+import MapBackground from "../components/MapBackground";
 import { useProgress } from "../state/progress";
 import { STATIONS } from "../data/stations";
 
@@ -77,6 +78,7 @@ export default function MapScreen() {
           animation: direction-pulse 1.5s ease-in-out infinite;
         }
       `}</style>
+      <MapBackground />
       {STATIONS.map((s) => (
         <StationMarker
           key={s.id}
