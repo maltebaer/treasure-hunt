@@ -26,6 +26,33 @@ export default function MapScreen() {
     setOpenStationId(null);
   }
 
+  const lastSolvedId =
+    solvedStations.length > 0 ? Math.max(...solvedStations) : null;
+  const lastSolved =
+    lastSolvedId !== null
+      ? (STATIONS.find((s) => s.id === lastSolvedId) ?? null)
+      : null;
+  const nextStation =
+    currentStation !== null
+      ? (STATIONS.find((s) => s.id === currentStation) ?? null)
+      : null;
+
+  let arrow: {
+    x: number;
+    y: number;
+    angle: number;
+  } | null = null;
+  if (lastSolved && nextStation) {
+    const mx =
+      (lastSolved.markerPosition.x + nextStation.markerPosition.x) / 2;
+    const my =
+      (lastSolved.markerPosition.y + nextStation.markerPosition.y) / 2;
+    const dx = nextStation.markerPosition.x - lastSolved.markerPosition.x;
+    const dy = nextStation.markerPosition.y - lastSolved.markerPosition.y;
+    const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+    arrow = { x: mx, y: my, angle };
+  }
+
   return (
     <main
       data-testid="map-screen"
@@ -42,6 +69,13 @@ export default function MapScreen() {
           0%, 100% { transform: translate(-50%, -50%) scale(1); }
           50%      { transform: translate(-50%, -50%) scale(1.15); }
         }
+        @keyframes direction-pulse {
+          0%, 100% { transform: scale(1); }
+          50%      { transform: scale(1.1); }
+        }
+        .direction-pulse {
+          animation: direction-pulse 1.5s ease-in-out infinite;
+        }
       `}</style>
       {STATIONS.map((s) => (
         <StationMarker
@@ -54,6 +88,24 @@ export default function MapScreen() {
           onClick={() => setOpenStationId(s.id)}
         />
       ))}
+      {arrow && (
+        <div
+          data-testid="direction-arrow"
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            left: `${arrow.x}%`,
+            top: `${arrow.y}%`,
+            transform: `translate(-50%, -50%) rotate(${arrow.angle}deg)`,
+            fontSize: "2rem",
+            color: "#5d4037",
+            animation: "direction-pulse 1.5s ease-in-out infinite",
+            pointerEvents: "none",
+          }}
+        >
+          →
+        </div>
+      )}
       {openStation && (
         <RiddleModal
           station={openStation}

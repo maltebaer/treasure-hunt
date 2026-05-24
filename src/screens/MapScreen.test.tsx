@@ -130,6 +130,41 @@ describe("MapScreen", () => {
     expect(burst).not.toHaveBeenCalled();
   });
 
+  it("renders no direction arrow before any station is solved", () => {
+    renderWithProgress(<MapScreen />);
+    expect(screen.queryByTestId("direction-arrow")).not.toBeInTheDocument();
+  });
+
+  it("renders a direction arrow between last-solved and active marker", () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ solvedStations: [1] }),
+    );
+    renderWithProgress(<MapScreen />);
+    expect(screen.getByTestId("direction-arrow")).toBeInTheDocument();
+  });
+
+  it("renders no direction arrow when all stations are solved", () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ solvedStations: [1, 2, 3, 4, 5, 6, 7] }),
+    );
+    renderWithProgress(<MapScreen />);
+    expect(screen.queryByTestId("direction-arrow")).not.toBeInTheDocument();
+  });
+
+  it("renders the direction arrow + word with pulse animation in the success view", async () => {
+    const user = userEvent.setup();
+    renderWithProgress(<MapScreen />);
+    await user.click(screen.getByTestId("station-marker-1"));
+    const dialog = screen.getByRole("dialog");
+    await user.click(within(dialog).getByRole("button", { name: /Biene/i }));
+    const directionLabel = within(dialog).getByTestId("direction-label");
+    expect(directionLabel).toHaveTextContent("↖");
+    expect(directionLabel).toHaveTextContent("NORDWEST");
+    expect(directionLabel.className).toMatch(/direction-pulse/);
+  });
+
   it("restores progress on mount", () => {
     localStorage.setItem(
       STORAGE_KEY,

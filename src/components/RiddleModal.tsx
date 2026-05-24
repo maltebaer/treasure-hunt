@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Option, Station } from "../data/stations";
 import { burst } from "../lib/confetti";
+import { getArrowGlyph } from "../lib/directions";
 
 type Props = {
   station: Station;
@@ -68,9 +69,25 @@ export default function RiddleModal({ station, onClose, onSolved }: Props) {
         {answeredCorrectly ? (
           <div>
             <h1>RICHTIG!</h1>
-            <p>
-              Geh nach <strong>{station.direction}</strong>
-            </p>
+            <p>Geh nach</p>
+            <div
+              data-testid="direction-label"
+              className="direction-pulse"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "0.75rem",
+                fontSize: "3rem",
+                fontWeight: 700,
+                margin: "1rem 0",
+              }}
+            >
+              <span aria-hidden="true">
+                {getArrowGlyph(station.directionShort)}
+              </span>
+              <span>{station.direction}</span>
+            </div>
             <p>Suche das {station.scarfColorLabel} Tuch!</p>
             {station.isTreasure && <p>Dort liegt der Schatz!</p>}
             <button type="button" onClick={handleFound}>
