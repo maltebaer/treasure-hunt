@@ -95,4 +95,77 @@ describe("useProgress (via ProgressProvider)", () => {
     act(() => result.current.solve(1));
     expect(result.current.solvedStations).toEqual([1]);
   });
+
+  it("reset clears solvedStations and localStorage", () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ solvedStations: [1, 2, 3] }),
+    );
+    const { result } = renderHook(() => useProgress(), {
+      wrapper: ProgressProvider,
+    });
+    act(() => result.current.reset());
+    expect(result.current.solvedStations).toEqual([]);
+    expect(result.current.currentStation).toBe(1);
+    expect(
+      JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}").solvedStations,
+    ).toEqual([]);
+  });
+
+  it("jumpTo(4) marks 1-3 solved and currentStation === 4", () => {
+    const { result } = renderHook(() => useProgress(), {
+      wrapper: ProgressProvider,
+    });
+    act(() => result.current.jumpTo(4));
+    expect(result.current.solvedStations).toEqual([1, 2, 3]);
+    expect(result.current.currentStation).toBe(4);
+  });
+
+  it("jumpTo(1) clears progress", () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ solvedStations: [1, 2] }),
+    );
+    const { result } = renderHook(() => useProgress(), {
+      wrapper: ProgressProvider,
+    });
+    act(() => result.current.jumpTo(1));
+    expect(result.current.solvedStations).toEqual([]);
+    expect(result.current.currentStation).toBe(1);
+  });
+
+  it("jumpTo clamps to valid range", () => {
+    const { result } = renderHook(() => useProgress(), {
+      wrapper: ProgressProvider,
+    });
+    act(() => result.current.jumpTo(99));
+    expect(result.current.solvedStations).toEqual([1, 2, 3, 4, 5, 6]);
+    expect(result.current.currentStation).toBe(7);
+  });
+
+  it("skipCurrent marks the current station solved", () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ solvedStations: [1] }),
+    );
+    const { result } = renderHook(() => useProgress(), {
+      wrapper: ProgressProvider,
+    });
+    act(() => result.current.skipCurrent());
+    expect(result.current.solvedStations).toEqual([1, 2]);
+    expect(result.current.currentStation).toBe(3);
+  });
+
+  it("skipCurrent is a no-op when all stations are solved", () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ solvedStations: [1, 2, 3, 4, 5, 6, 7] }),
+    );
+    const { result } = renderHook(() => useProgress(), {
+      wrapper: ProgressProvider,
+    });
+    act(() => result.current.skipCurrent());
+    expect(result.current.solvedStations).toEqual([1, 2, 3, 4, 5, 6, 7]);
+    expect(result.current.currentStation).toBeNull();
+  });
 });

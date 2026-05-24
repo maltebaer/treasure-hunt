@@ -51,6 +51,9 @@ export type UseProgressResult = {
   solvedStations: number[];
   currentStation: number | null;
   solve: (stationId: number) => void;
+  reset: () => void;
+  jumpTo: (stationId: number) => void;
+  skipCurrent: () => void;
 };
 
 const ProgressContext = createContext<UseProgressResult | null>(null);
@@ -69,14 +72,43 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const reset = useCallback(() => {
+    setSolvedStations([]);
+    saveProgress({ solvedStations: [] });
+  }, []);
+
+  const jumpTo = useCallback((stationId: number) => {
+    const clamped = Math.max(1, Math.min(TOTAL_STATIONS, stationId));
+    const next = Array.from({ length: clamped - 1 }, (_, i) => i + 1);
+    setSolvedStations(next);
+    saveProgress({ solvedStations: next });
+  }, []);
+
+  const skipCurrent = useCallback(() => {
+    setSolvedStations((prev) => {
+      const current = deriveCurrentStation(prev);
+      if (current === null) return prev;
+      const next = [...prev, current];
+      saveProgress({ solvedStations: next });
+      return next;
+    });
+  }, []);
+
   const currentStation = useMemo(
     () => deriveCurrentStation(solvedStations),
     [solvedStations],
   );
 
   const value = useMemo<UseProgressResult>(
-    () => ({ solvedStations, currentStation, solve }),
-    [solvedStations, currentStation, solve],
+    () => ({
+      solvedStations,
+      currentStation,
+      solve,
+      reset,
+      jumpTo,
+      skipCurrent,
+    }),
+    [solvedStations, currentStation, solve, reset, jumpTo, skipCurrent],
   );
 
   return (

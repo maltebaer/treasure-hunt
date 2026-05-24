@@ -49,18 +49,6 @@ export default function MapBackground() {
         <text x="-6.5" y="0.8" fontSize="2.2" textAnchor="middle" fill="#5d4037">W</text>
       </g>
 
-      {/* Title "Schatzkarte" */}
-      <text
-        x="50"
-        y="6.5"
-        textAnchor="middle"
-        fontSize="5"
-        fontFamily="'Bradley Hand', 'Marker Felt', 'Brush Script MT', cursive"
-        fill="#3e2723"
-        fontWeight="700"
-      >
-        Schatzkarte
-      </text>
     </svg>
   );
 }

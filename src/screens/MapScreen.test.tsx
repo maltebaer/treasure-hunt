@@ -1,4 +1,4 @@
-import { act, screen, within } from "@testing-library/react";
+import { act, fireEvent, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import MapScreen from "./MapScreen";
@@ -200,6 +200,117 @@ describe("MapScreen", () => {
     expect(directionLabel).toHaveTextContent("↖");
     expect(directionLabel).toHaveTextContent("NORDWEST");
     expect(directionLabel.className).toMatch(/direction-pulse/);
+  });
+
+  it("opens the admin menu after holding the title for 1500ms", () => {
+    vi.useFakeTimers();
+    renderWithProgress(<MapScreen />);
+    fireEvent.mouseDown(screen.getByTestId("map-title"));
+    act(() => {
+      vi.advanceTimersByTime(1500);
+    });
+    expect(screen.getByTestId("admin-menu")).toBeInTheDocument();
+    vi.useRealTimers();
+  });
+
+  it("does not open the admin menu if released before 1500ms", () => {
+    vi.useFakeTimers();
+    renderWithProgress(<MapScreen />);
+    const title = screen.getByTestId("map-title");
+    fireEvent.mouseDown(title);
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    fireEvent.mouseUp(title);
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    expect(screen.queryByTestId("admin-menu")).not.toBeInTheDocument();
+    vi.useRealTimers();
+  });
+
+  it("admin 'Spiel zurücksetzen' clears progress and closes the menu", async () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ solvedStations: [1, 2, 3] }),
+    );
+    vi.useFakeTimers();
+    renderWithProgress(<MapScreen />);
+    fireEvent.mouseDown(screen.getByTestId("map-title"));
+    act(() => {
+      vi.advanceTimersByTime(1500);
+    });
+    vi.useRealTimers();
+    const user = userEvent.setup();
+    await user.click(
+      screen.getByRole("button", { name: /Spiel zurücksetzen/i }),
+    );
+    expect(screen.queryByTestId("admin-menu")).not.toBeInTheDocument();
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}");
+    expect(stored.solvedStations).toEqual([]);
+    expect(screen.getByTestId("station-marker-1")).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+  });
+
+  it("admin 'Springe zu Station 4' yields solvedStations [1,2,3] with station 4 active", async () => {
+    vi.useFakeTimers();
+    renderWithProgress(<MapScreen />);
+    fireEvent.mouseDown(screen.getByTestId("map-title"));
+    act(() => {
+      vi.advanceTimersByTime(1500);
+    });
+    vi.useRealTimers();
+    const user = userEvent.setup();
+    await user.click(
+      screen.getByRole("button", { name: /Springe zu Station 4/i }),
+    );
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}");
+    expect(stored.solvedStations).toEqual([1, 2, 3]);
+    expect(screen.getByTestId("station-marker-4")).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+  });
+
+  it("admin 'Nächste Station überspringen' marks the current station solved", async () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ solvedStations: [1] }),
+    );
+    vi.useFakeTimers();
+    renderWithProgress(<MapScreen />);
+    fireEvent.mouseDown(screen.getByTestId("map-title"));
+    act(() => {
+      vi.advanceTimersByTime(1500);
+    });
+    vi.useRealTimers();
+    const user = userEvent.setup();
+    await user.click(
+      screen.getByRole("button", { name: /überspringen/i }),
+    );
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}");
+    expect(stored.solvedStations).toEqual([1, 2]);
+  });
+
+  it("admin 'Schließen' closes the menu without changing state", async () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ solvedStations: [1] }),
+    );
+    vi.useFakeTimers();
+    renderWithProgress(<MapScreen />);
+    fireEvent.mouseDown(screen.getByTestId("map-title"));
+    act(() => {
+      vi.advanceTimersByTime(1500);
+    });
+    vi.useRealTimers();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: /Schließen/i }));
+    expect(screen.queryByTestId("admin-menu")).not.toBeInTheDocument();
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}");
+    expect(stored.solvedStations).toEqual([1]);
   });
 
   it("restores progress on mount", () => {
