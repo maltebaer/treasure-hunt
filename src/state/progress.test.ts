@@ -1,6 +1,11 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { act, renderHook } from "@testing-library/react";
-import { loadProgress, saveProgress, useProgress } from "./progress";
+import {
+  loadProgress,
+  ProgressProvider,
+  saveProgress,
+  useProgress,
+} from "./progress";
 
 const STORAGE_KEY = "treasure-hunt:progress";
 
@@ -29,19 +34,23 @@ describe("loadProgress / saveProgress", () => {
   });
 });
 
-describe("useProgress", () => {
+describe("useProgress (via ProgressProvider)", () => {
   beforeEach(() => {
     localStorage.clear();
   });
 
   it("starts with empty solvedStations and currentStation === 1", () => {
-    const { result } = renderHook(() => useProgress());
+    const { result } = renderHook(() => useProgress(), {
+      wrapper: ProgressProvider,
+    });
     expect(result.current.solvedStations).toEqual([]);
     expect(result.current.currentStation).toBe(1);
   });
 
   it("solve(1) updates solvedStations and currentStation === 2", () => {
-    const { result } = renderHook(() => useProgress());
+    const { result } = renderHook(() => useProgress(), {
+      wrapper: ProgressProvider,
+    });
     act(() => result.current.solve(1));
     expect(result.current.solvedStations).toEqual([1]);
     expect(result.current.currentStation).toBe(2);
@@ -52,7 +61,9 @@ describe("useProgress", () => {
       STORAGE_KEY,
       JSON.stringify({ solvedStations: [1] }),
     );
-    const { result } = renderHook(() => useProgress());
+    const { result } = renderHook(() => useProgress(), {
+      wrapper: ProgressProvider,
+    });
     expect(result.current.currentStation).toBe(2);
   });
 
@@ -61,19 +72,25 @@ describe("useProgress", () => {
       STORAGE_KEY,
       JSON.stringify({ solvedStations: [1, 2, 3, 4, 5, 6, 7] }),
     );
-    const { result } = renderHook(() => useProgress());
+    const { result } = renderHook(() => useProgress(), {
+      wrapper: ProgressProvider,
+    });
     expect(result.current.currentStation).toBeNull();
   });
 
   it("solve persists to localStorage", () => {
-    const { result } = renderHook(() => useProgress());
+    const { result } = renderHook(() => useProgress(), {
+      wrapper: ProgressProvider,
+    });
     act(() => result.current.solve(1));
     const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}");
     expect(stored.solvedStations).toEqual([1]);
   });
 
   it("solve is idempotent", () => {
-    const { result } = renderHook(() => useProgress());
+    const { result } = renderHook(() => useProgress(), {
+      wrapper: ProgressProvider,
+    });
     act(() => result.current.solve(1));
     act(() => result.current.solve(1));
     expect(result.current.solvedStations).toEqual([1]);

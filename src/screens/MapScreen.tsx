@@ -26,8 +26,6 @@ export default function MapScreen() {
     setOpenStationId(null);
   }
 
-  const allSolved = solvedStations.length === STATIONS.length;
-
   return (
     <main
       data-testid="map-screen"
@@ -62,26 +60,6 @@ export default function MapScreen() {
           onClose={() => setOpenStationId(null)}
           onSolved={handleSolved}
         />
-      )}
-      {allSolved && (
-        <div
-          data-testid="treasure-placeholder"
-          role="status"
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(255, 215, 0, 0.92)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "2.5rem",
-            padding: "2rem",
-            textAlign: "center",
-            fontWeight: 700,
-          }}
-        >
-          Du hast den Schatz gefunden!
-        </div>
       )}
     </main>
   );

@@ -1,7 +1,8 @@
-import { render, screen, within } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, beforeEach } from "vitest";
 import MapScreen from "./MapScreen";
+import { renderWithProgress } from "../test/render";
 
 const STORAGE_KEY = "treasure-hunt:progress";
 
@@ -35,14 +36,14 @@ describe("MapScreen", () => {
   });
 
   it("renders seven station markers", () => {
-    render(<MapScreen />);
+    renderWithProgress(<MapScreen />);
     for (let id = 1; id <= 7; id++) {
       expect(screen.getByTestId(`station-marker-${id}`)).toBeInTheDocument();
     }
   });
 
   it("enables only marker 1 and disables markers 2-7 at the start", () => {
-    render(<MapScreen />);
+    renderWithProgress(<MapScreen />);
     expect(screen.getByTestId("station-marker-1")).toBeEnabled();
     for (let id = 2; id <= 7; id++) {
       expect(screen.getByTestId(`station-marker-${id}`)).toBeDisabled();
@@ -51,7 +52,7 @@ describe("MapScreen", () => {
 
   it("opens the riddle modal when marker 1 is tapped", async () => {
     const user = userEvent.setup();
-    render(<MapScreen />);
+    renderWithProgress(<MapScreen />);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     await user.click(screen.getByTestId("station-marker-1"));
     const dialog = screen.getByRole("dialog");
@@ -61,7 +62,7 @@ describe("MapScreen", () => {
 
   it("closes the modal without solving when the close button is tapped", async () => {
     const user = userEvent.setup();
-    render(<MapScreen />);
+    renderWithProgress(<MapScreen />);
     await user.click(screen.getByTestId("station-marker-1"));
     const dialog = screen.getByRole("dialog");
     await user.click(within(dialog).getByRole("button", { name: /schließen/i }));
@@ -74,7 +75,7 @@ describe("MapScreen", () => {
 
   it("activates marker 2 (Lina) after marker 1 is solved", async () => {
     const user = userEvent.setup();
-    render(<MapScreen />);
+    renderWithProgress(<MapScreen />);
     await solveStation(user, 1);
     expect(screen.getByTestId("station-marker-1")).toHaveAttribute(
       "data-state",
@@ -93,7 +94,7 @@ describe("MapScreen", () => {
       JSON.stringify({ solvedStations: [1] }),
     );
     const user = userEvent.setup();
-    render(<MapScreen />);
+    renderWithProgress(<MapScreen />);
     await solveStation(user, 2);
     expect(screen.getByTestId("station-marker-3")).toHaveAttribute(
       "data-state",
@@ -102,24 +103,19 @@ describe("MapScreen", () => {
     expect(screen.getByTestId("station-marker-3")).toBeEnabled();
   });
 
-  it("plays through all seven stations and reveals the treasure placeholder", async () => {
-    const user = userEvent.setup();
-    render(<MapScreen />);
-    for (let id = 1; id <= 7; id++) {
-      await solveStation(user, id);
-    }
-    expect(screen.getByTestId("treasure-placeholder")).toBeInTheDocument();
-    expect(screen.getByText(/Du hast den Schatz gefunden/i)).toBeInTheDocument();
-    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}");
-    expect(stored.solvedStations).toEqual([1, 2, 3, 4, 5, 6, 7]);
-  });
-
-  it("shows the treasure placeholder on mount when all stations are solved", () => {
+  it("restores progress on mount", () => {
     localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ solvedStations: [1, 2, 3, 4, 5, 6, 7] }),
+      JSON.stringify({ solvedStations: [1] }),
     );
-    render(<MapScreen />);
-    expect(screen.getByTestId("treasure-placeholder")).toBeInTheDocument();
+    renderWithProgress(<MapScreen />);
+    expect(screen.getByTestId("station-marker-1")).toHaveAttribute(
+      "data-state",
+      "solved",
+    );
+    expect(screen.getByTestId("station-marker-2")).toHaveAttribute(
+      "data-state",
+      "active",
+    );
   });
 });

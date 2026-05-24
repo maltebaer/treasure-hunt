@@ -1,7 +1,13 @@
-import { useCallback, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 
 const STORAGE_KEY = "treasure-hunt:progress";
-
 export const TOTAL_STATIONS = 7;
 
 export type Progress = {
@@ -47,7 +53,9 @@ export type UseProgressResult = {
   solve: (stationId: number) => void;
 };
 
-export function useProgress(): UseProgressResult {
+const ProgressContext = createContext<UseProgressResult | null>(null);
+
+export function ProgressProvider({ children }: { children: ReactNode }) {
   const [solvedStations, setSolvedStations] = useState<number[]>(
     () => loadProgress().solvedStations,
   );
@@ -66,5 +74,22 @@ export function useProgress(): UseProgressResult {
     [solvedStations],
   );
 
-  return { solvedStations, currentStation, solve };
+  const value = useMemo<UseProgressResult>(
+    () => ({ solvedStations, currentStation, solve }),
+    [solvedStations, currentStation, solve],
+  );
+
+  return (
+    <ProgressContext.Provider value={value}>
+      {children}
+    </ProgressContext.Provider>
+  );
+}
+
+export function useProgress(): UseProgressResult {
+  const ctx = useContext(ProgressContext);
+  if (!ctx) {
+    throw new Error("useProgress must be used within a ProgressProvider");
+  }
+  return ctx;
 }
