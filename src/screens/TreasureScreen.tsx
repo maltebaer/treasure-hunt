@@ -1,8 +1,15 @@
+import { useEffect } from "react";
+import { shower } from "../lib/confetti";
+
 type Props = {
   onViewMap: () => void;
 };
 
 export default function TreasureScreen({ onViewMap }: Props) {
+  useEffect(() => {
+    shower();
+  }, []);
+
   return (
     <main
       data-testid="treasure-screen"

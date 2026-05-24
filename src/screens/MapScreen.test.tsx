@@ -1,8 +1,14 @@
 import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import MapScreen from "./MapScreen";
 import { renderWithProgress } from "../test/render";
+import { burst } from "../lib/confetti";
+
+vi.mock("../lib/confetti", () => ({
+  burst: vi.fn(),
+  shower: vi.fn(),
+}));
 
 const STORAGE_KEY = "treasure-hunt:progress";
 
@@ -33,6 +39,7 @@ async function solveStation(
 describe("MapScreen", () => {
   beforeEach(() => {
     localStorage.clear();
+    vi.mocked(burst).mockClear();
   });
 
   it("renders seven station markers", () => {
@@ -101,6 +108,26 @@ describe("MapScreen", () => {
       "active",
     );
     expect(screen.getByTestId("station-marker-3")).toBeEnabled();
+  });
+
+  it("fires confetti once when the correct answer is tapped", async () => {
+    const user = userEvent.setup();
+    renderWithProgress(<MapScreen />);
+    await user.click(screen.getByTestId("station-marker-1"));
+    const dialog = screen.getByRole("dialog");
+    await user.click(within(dialog).getByRole("button", { name: /Biene/i }));
+    expect(burst).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not fire confetti when a wrong answer is tapped", async () => {
+    const user = userEvent.setup();
+    renderWithProgress(<MapScreen />);
+    await user.click(screen.getByTestId("station-marker-1"));
+    const dialog = screen.getByRole("dialog");
+    await user.click(
+      within(dialog).getByRole("button", { name: /Marienkäfer/i }),
+    );
+    expect(burst).not.toHaveBeenCalled();
   });
 
   it("restores progress on mount", () => {

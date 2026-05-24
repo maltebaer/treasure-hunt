@@ -1,4 +1,10 @@
 import "@testing-library/jest-dom";
+import { vi } from "vitest";
+
+// canvas-confetti needs a real canvas; in jsdom it throws when the animation
+// frame fires. Tests that care about confetti mock our wrapper lib directly.
+vi.mock("canvas-confetti", () => ({ default: vi.fn() }));
+
 
 // Node 22+ ships an experimental `localStorage` global that lacks several
 // Storage methods (e.g. `clear`) when no `--localstorage-file` is set, which

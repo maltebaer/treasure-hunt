@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Option, Station } from "../data/stations";
+import { burst } from "../lib/confetti";
 
 type Props = {
   station: Station;
@@ -9,6 +10,10 @@ type Props = {
 
 export default function RiddleModal({ station, onClose, onSolved }: Props) {
   const [answeredCorrectly, setAnsweredCorrectly] = useState(false);
+
+  useEffect(() => {
+    if (answeredCorrectly) burst();
+  }, [answeredCorrectly]);
 
   function handleAnswer(option: Option) {
     if (option.correct) setAnsweredCorrectly(true);
