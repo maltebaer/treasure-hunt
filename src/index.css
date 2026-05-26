@@ -1,22 +1,69 @@
 :root {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  font-family: "Nunito", -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    system-ui, sans-serif;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  color: #3d4a35;
 }
 
+html,
 body {
   margin: 0;
+  padding: 0;
+  background: #efe9d8;
   min-height: 100vh;
+  overscroll-behavior: none;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-8px); }
-  40% { transform: translateX(8px); }
-  60% { transform: translateX(-6px); }
-  80% { transform: translateX(6px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-8px);
+  }
+  40% {
+    transform: translateX(8px);
+  }
+  60% {
+    transform: translateX(-6px);
+  }
+  80% {
+    transform: translateX(6px);
+  }
 }
 
 .shaking {
   animation: shake 0.4s ease-in-out;
+}
+
+@keyframes direction-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+.direction-pulse {
+  animation: direction-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes marker-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0 rgba(255, 255, 255, 0));
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.55));
+    transform: translate(-50%, -50%) scale(1.06);
+  }
 }
