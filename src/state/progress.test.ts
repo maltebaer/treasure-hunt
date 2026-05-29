@@ -1,13 +1,16 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { act, renderHook } from "@testing-library/react";
 import {
+  loadAssignments,
   loadProgress,
+  pickSlotForName,
   ProgressProvider,
   saveProgress,
   useProgress,
 } from "./progress";
 
 const STORAGE_KEY = "treasure-hunt:progress";
+const ASSIGNMENTS_KEY = "treasure-hunt:assignments";
 
 describe("loadProgress / saveProgress", () => {
   beforeEach(() => {
@@ -167,5 +170,106 @@ describe("useProgress (via ProgressProvider)", () => {
     act(() => result.current.skipCurrent());
     expect(result.current.solvedStations).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
     expect(result.current.currentStation).toBeNull();
+  });
+});
+
+describe("pickSlotForName", () => {
+  it("returns 1 for Milla", () => {
+    expect(pickSlotForName("Milla", {})).toBe(1);
+  });
+
+  it("returns 8 for Michel", () => {
+    expect(pickSlotForName("Michel", {})).toBe(8);
+  });
+
+  it("returns null if name is already assigned", () => {
+    expect(pickSlotForName("Milla", { 1: "Milla" })).toBeNull();
+  });
+
+  it("picks deterministically with a seeded random fn", () => {
+    expect(pickSlotForName("Finja", {}, () => 0)).toBe(2);
+    expect(pickSlotForName("Finja", {}, () => 0.999)).toBe(7);
+  });
+
+  it("skips slots that are already taken", () => {
+    expect(
+      pickSlotForName(
+        "Finja",
+        { 2: "Lina", 3: "Friedi", 4: "Fiete" },
+        () => 0,
+      ),
+    ).toBe(5);
+  });
+});
+
+describe("assignments lifecycle", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("commits an assignment and persists it", () => {
+    const { result } = renderHook(() => useProgress(), {
+      wrapper: ProgressProvider,
+    });
+    act(() => result.current.commitAssignment(1, "Milla"));
+    expect(result.current.assignments).toEqual({ 1: "Milla" });
+    expect(loadAssignments()).toEqual({ 1: "Milla" });
+  });
+
+  it("commit is a no-op when slot already taken", () => {
+    const { result } = renderHook(() => useProgress(), {
+      wrapper: ProgressProvider,
+    });
+    act(() => result.current.commitAssignment(1, "Milla"));
+    act(() => result.current.commitAssignment(1, "Finja"));
+    expect(result.current.assignments).toEqual({ 1: "Milla" });
+  });
+
+  it("commit is a no-op when name already assigned to another slot", () => {
+    const { result } = renderHook(() => useProgress(), {
+      wrapper: ProgressProvider,
+    });
+    act(() => result.current.commitAssignment(2, "Finja"));
+    act(() => result.current.commitAssignment(3, "Finja"));
+    expect(result.current.assignments).toEqual({ 2: "Finja" });
+  });
+
+  it("resetAssignments wipes the slice", () => {
+    localStorage.setItem(ASSIGNMENTS_KEY, JSON.stringify({ 1: "Milla" }));
+    const { result } = renderHook(() => useProgress(), {
+      wrapper: ProgressProvider,
+    });
+    act(() => result.current.resetAssignments());
+    expect(result.current.assignments).toEqual({});
+    expect(loadAssignments()).toEqual({});
+  });
+
+  it("reset clears both solvedStations and assignments", () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ solvedStations: [1, 2] }),
+    );
+    localStorage.setItem(
+      ASSIGNMENTS_KEY,
+      JSON.stringify({ 1: "Milla", 2: "Finja" }),
+    );
+    const { result } = renderHook(() => useProgress(), {
+      wrapper: ProgressProvider,
+    });
+    act(() => result.current.reset());
+    expect(result.current.solvedStations).toEqual([]);
+    expect(result.current.assignments).toEqual({});
+    expect(loadAssignments()).toEqual({});
+  });
+
+  it("hydrates assignments from localStorage on mount", () => {
+    localStorage.setItem(
+      ASSIGNMENTS_KEY,
+      JSON.stringify({ 1: "Milla", 8: "Michel" }),
+    );
+    const { result } = renderHook(() => useProgress(), {
+      wrapper: ProgressProvider,
+    });
+    expect(result.current.assignments).toEqual({ 1: "Milla", 8: "Michel" });
   });
 });

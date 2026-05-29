@@ -6,12 +6,20 @@ type Props = {
 };
 
 export default function AdminMenu({ onClose }: Props) {
-  const { reset, jumpTo, skipCurrent, solvedStations, currentStation } =
-    useProgress();
-  const currentKid =
+  const {
+    reset,
+    jumpTo,
+    skipCurrent,
+    solvedStations,
+    currentStation,
+    assignments,
+  } = useProgress();
+  const currentSlot =
     currentStation !== null
       ? STATIONS.find((s) => s.id === currentStation)
       : null;
+  const currentKidName =
+    currentStation !== null ? (assignments[currentStation] ?? null) : null;
 
   function handleReset() {
     reset();
@@ -115,13 +123,13 @@ export default function AdminMenu({ onClose }: Props) {
           }}
         >
           Fortschritt: <strong>{solvedStations.length} / {STATIONS.length}</strong> Stationen
-          {currentKid && (
+          {currentSlot && (
             <>
               {" "}· Aktuell{" "}
-              <strong style={{ color: currentKid.scarfColor }}>
-                {currentKid.childName}
+              <strong style={{ color: currentSlot.scarfColor }}>
+                {currentKidName ?? "???"}
               </strong>{" "}
-              (Station {currentKid.id})
+              (Station {currentSlot.id})
             </>
           )}
         </div>
@@ -171,7 +179,7 @@ export default function AdminMenu({ onClose }: Props) {
                 >
                   {s.id}
                   <span style={{ fontSize: 9, fontWeight: 700, opacity: 0.85 }}>
-                    {s.childName}
+                    {assignments[s.id] ?? "???"}
                   </span>
                 </button>
               );

@@ -6,7 +6,6 @@ export type Option = {
 
 export type Station = {
   id: number;
-  childName: string;
   scarfColor: string;
   scarfColorLabel: string;
   direction: string | null;
@@ -17,10 +16,33 @@ export type Station = {
   markerPosition: { x: number; y: number };
 };
 
+export const CHILDREN = [
+  "Finja",
+  "Lina",
+  "Friedi",
+  "Fiete",
+  "Esmee",
+  "Ronja",
+  "Milla",
+  "Michel",
+] as const;
+
+export type ChildName = (typeof CHILDREN)[number];
+
+export const FIXED_ASSIGNMENTS: Record<ChildName, number | null> = {
+  Finja: null,
+  Lina: null,
+  Friedi: null,
+  Fiete: null,
+  Esmee: null,
+  Ronja: null,
+  Milla: 1,
+  Michel: 8,
+};
+
 export const STATIONS: Station[] = [
   {
     id: 1,
-    childName: "Finja",
     scarfColor: "#f4a8c4",
     scarfColorLabel: "rosa",
     direction: null,
@@ -37,7 +59,6 @@ export const STATIONS: Station[] = [
   },
   {
     id: 2,
-    childName: "Lina",
     scarfColor: "#6cb5d9",
     scarfColorLabel: "hellblaue",
     direction: "OSTEN",
@@ -54,7 +75,6 @@ export const STATIONS: Station[] = [
   },
   {
     id: 3,
-    childName: "Friedi",
     scarfColor: "#d8625a",
     scarfColorLabel: "rote",
     direction: "SÜDWEST",
@@ -70,7 +90,6 @@ export const STATIONS: Station[] = [
   },
   {
     id: 4,
-    childName: "Fiete",
     scarfColor: "#9a7bb6",
     scarfColorLabel: "lila",
     direction: "SÜDWEST",
@@ -86,7 +105,6 @@ export const STATIONS: Station[] = [
   },
   {
     id: 5,
-    childName: "Esmee",
     scarfColor: "#e6c25c",
     scarfColorLabel: "gelbe",
     direction: "WESTEN",
@@ -102,7 +120,6 @@ export const STATIONS: Station[] = [
   },
   {
     id: 6,
-    childName: "Ronja",
     scarfColor: "#d9874b",
     scarfColorLabel: "orange",
     direction: "SÜDOST",
@@ -118,7 +135,6 @@ export const STATIONS: Station[] = [
   },
   {
     id: 7,
-    childName: "Milla",
     scarfColor: "#7aa86b",
     scarfColorLabel: "grüne",
     direction: "NORDOSTEN",
@@ -134,7 +150,6 @@ export const STATIONS: Station[] = [
   },
   {
     id: 8,
-    childName: "Michel",
     scarfColor: "#2e4a7a",
     scarfColorLabel: "dunkelblaue",
     direction: "NORDEN",

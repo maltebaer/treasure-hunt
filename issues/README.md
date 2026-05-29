@@ -28,6 +28,7 @@ Each issue is a thin, vertical slice: it touches all relevant layers (UI, state,
 13. `13-watercolor-design.md` — Watercolor design pass (committed; no issue file)
 14. `14-milla-station-colors-difficulty.md` — 8th station (Milla), treasure reveal, new color palette, harder riddles
 15. `15-station-1-no-direction.md` — Station 1 skips direction display (stations 2–8 unchanged)
+16. `16-random-name-generator.md` — Compass-triggered modal randomly assigns names to colored slots (Milla → 1, Michel → 8 fixed)
 
 ## Conventions
 

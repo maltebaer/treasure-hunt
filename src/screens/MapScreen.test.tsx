@@ -11,6 +11,22 @@ vi.mock("../lib/confetti", () => ({
 }));
 
 const STORAGE_KEY = "treasure-hunt:progress";
+const ASSIGNMENTS_KEY = "treasure-hunt:assignments";
+
+const FULL_ASSIGNMENTS: Record<number, string> = {
+  1: "Milla",
+  2: "Finja",
+  3: "Lina",
+  4: "Friedi",
+  5: "Fiete",
+  6: "Esmee",
+  7: "Ronja",
+  8: "Michel",
+};
+
+function seedAssignments() {
+  localStorage.setItem(ASSIGNMENTS_KEY, JSON.stringify(FULL_ASSIGNMENTS));
+}
 
 const CORRECT_OPTION_LABEL: Record<number, RegExp> = {
   1: /Sieben/i,
@@ -40,6 +56,7 @@ async function solveStation(
 describe("MapScreen", () => {
   beforeEach(() => {
     localStorage.clear();
+    seedAssignments();
     vi.mocked(burst).mockClear();
   });
 
@@ -357,5 +374,105 @@ describe("MapScreen", () => {
       "data-state",
       "active",
     );
+  });
+
+  describe("Glücksrad / generator", () => {
+    it("renders the compass button with accessible label", () => {
+      renderWithProgress(<MapScreen />);
+      expect(
+        screen.getByRole("button", { name: /Glücksrad öffnen/i }),
+      ).toBeInTheDocument();
+    });
+
+    it("clicking compass opens the generator modal", async () => {
+      const user = userEvent.setup();
+      renderWithProgress(<MapScreen />);
+      expect(screen.queryByTestId("generator-modal")).not.toBeInTheDocument();
+      await user.click(
+        screen.getByRole("button", { name: /Glücksrad öffnen/i }),
+      );
+      expect(screen.getByTestId("generator-modal")).toBeInTheDocument();
+    });
+
+    it("marker labels show '???' when no assignments seeded", () => {
+      localStorage.removeItem(ASSIGNMENTS_KEY);
+      renderWithProgress(<MapScreen />);
+      for (let id = 1; id <= 8; id++) {
+        expect(
+          screen.getByTestId(`station-marker-${id}`),
+        ).toHaveTextContent("???");
+      }
+    });
+
+    it("clicking an active marker without assignment is a no-op", async () => {
+      localStorage.removeItem(ASSIGNMENTS_KEY);
+      const user = userEvent.setup();
+      renderWithProgress(<MapScreen />);
+      await user.click(screen.getByTestId("station-marker-1"));
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+
+    it("clicking Milla in the modal assigns slot 1 after the spin", async () => {
+      localStorage.removeItem(ASSIGNMENTS_KEY);
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+      renderWithProgress(<MapScreen />);
+      await user.click(
+        screen.getByRole("button", { name: /Glücksrad öffnen/i }),
+      );
+      await user.click(screen.getByRole("button", { name: /Milla zuweisen/i }));
+      act(() => {
+        vi.advanceTimersByTime(1600);
+      });
+      const stored = JSON.parse(localStorage.getItem(ASSIGNMENTS_KEY) ?? "{}");
+      expect(stored[1]).toBe("Milla");
+      expect(screen.getByTestId("station-marker-1")).toHaveTextContent("Milla");
+      vi.useRealTimers();
+    });
+
+    it("clicking Michel in the modal assigns slot 8 after the spin", async () => {
+      localStorage.removeItem(ASSIGNMENTS_KEY);
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+      renderWithProgress(<MapScreen />);
+      await user.click(
+        screen.getByRole("button", { name: /Glücksrad öffnen/i }),
+      );
+      await user.click(
+        screen.getByRole("button", { name: /Michel zuweisen/i }),
+      );
+      act(() => {
+        vi.advanceTimersByTime(1600);
+      });
+      const stored = JSON.parse(localStorage.getItem(ASSIGNMENTS_KEY) ?? "{}");
+      expect(stored[8]).toBe("Michel");
+      vi.useRealTimers();
+    });
+
+    it("an already-assigned name button is disabled", async () => {
+      const user = userEvent.setup();
+      renderWithProgress(<MapScreen />);
+      await user.click(
+        screen.getByRole("button", { name: /Glücksrad öffnen/i }),
+      );
+      expect(
+        screen.getByRole("button", { name: /Milla zuweisen/i }),
+      ).toBeDisabled();
+    });
+
+    it("admin 'Spiel zurücksetzen' clears assignments too", async () => {
+      vi.useFakeTimers();
+      renderWithProgress(<MapScreen />);
+      fireEvent.mouseDown(screen.getByTestId("map-title"));
+      act(() => {
+        vi.advanceTimersByTime(1500);
+      });
+      vi.useRealTimers();
+      const user = userEvent.setup();
+      await user.click(
+        screen.getByRole("button", { name: /Spiel zurücksetzen/i }),
+      );
+      expect(localStorage.getItem(ASSIGNMENTS_KEY)).toEqual("{}");
+    });
   });
 });

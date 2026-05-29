@@ -6,11 +6,17 @@ import { WCBlob, WCSplash } from "./watercolor";
 
 type Props = {
   station: Station;
+  childName: string;
   onClose: () => void;
   onSolved: (id: number) => void;
 };
 
-export default function RiddleModal({ station, onClose, onSolved }: Props) {
+export default function RiddleModal({
+  station,
+  childName,
+  onClose,
+  onSolved,
+}: Props) {
   const [answeredCorrectly, setAnsweredCorrectly] = useState(false);
   const [shakingLabel, setShakingLabel] = useState<string | null>(null);
   const [wrongLabel, setWrongLabel] = useState<string | null>(null);
@@ -39,7 +45,7 @@ export default function RiddleModal({ station, onClose, onSolved }: Props) {
     <div
       role="dialog"
       aria-modal="true"
-      aria-label={`Station ${station.id} · ${station.childName}`}
+      aria-label={`Station ${station.id} · ${childName}`}
       style={{
         position: "fixed",
         inset: 0,
@@ -111,10 +117,15 @@ export default function RiddleModal({ station, onClose, onSolved }: Props) {
         </button>
 
         {answeredCorrectly ? (
-          <CelebrateView station={station} onContinue={handleFound} />
+          <CelebrateView
+            station={station}
+            childName={childName}
+            onContinue={handleFound}
+          />
         ) : (
           <RiddleView
             station={station}
+            childName={childName}
             wrongLabel={wrongLabel}
             shakingLabel={shakingLabel}
             onAnswer={handleAnswer}
@@ -127,6 +138,7 @@ export default function RiddleModal({ station, onClose, onSolved }: Props) {
 
 type RiddleViewProps = {
   station: Station;
+  childName: string;
   wrongLabel: string | null;
   shakingLabel: string | null;
   onAnswer: (option: Option) => void;
@@ -134,6 +146,7 @@ type RiddleViewProps = {
 
 function RiddleView({
   station,
+  childName,
   wrongLabel,
   shakingLabel,
   onAnswer,
@@ -191,7 +204,7 @@ function RiddleView({
               fontWeight: 700,
             }}
           >
-            {station.childName} ist dran
+            {childName} ist dran
           </div>
         </div>
       </header>
@@ -352,10 +365,11 @@ function ChoiceButton({ option, isShaking, isWrong, onClick }: ChoiceProps) {
 
 type CelebrateProps = {
   station: Station;
+  childName: string;
   onContinue: () => void;
 };
 
-function CelebrateView({ station, onContinue }: CelebrateProps) {
+function CelebrateView({ station, childName, onContinue }: CelebrateProps) {
   return (
     <div
       style={{
@@ -389,8 +403,8 @@ function CelebrateView({ station, onContinue }: CelebrateProps) {
         }}
       >
         {station.directionShort
-          ? `${station.childName}, dein Tuch ist im …`
-          : `${station.childName}, hier ist dein Tuch!`}
+          ? `${childName}, dein Tuch ist im …`
+          : `${childName}, hier ist dein Tuch!`}
       </div>
 
       {station.directionShort && (

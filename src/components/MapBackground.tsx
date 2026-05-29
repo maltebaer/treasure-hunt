@@ -86,16 +86,6 @@ export default function MapBackground({ treasureRevealed = false }: Props) {
         </text>
       </g>
 
-      <g transform="translate(80, 920)">
-        <circle r={48} fill="#fbf6ec" opacity={0.9} filter="url(#wc-wobble)" />
-        <circle r={48} fill="none" stroke="#7a5a3d" strokeWidth={2} opacity={0.6} />
-        <path d="M 0,-44 L 7,0 L 0,44 L -7,0 Z" fill="#d8625a" opacity={0.78} filter="url(#wc-wobble)" />
-        <path d="M -44,0 L 0,-7 L 44,0 L 0,7 Z" fill="#3d4a35" opacity={0.55} filter="url(#wc-wobble)" />
-        <text y={-52} textAnchor="middle" fontFamily="Nunito, sans-serif" fontSize={13} fontWeight={800} fill="#3d4a35">N</text>
-        <text y={62} textAnchor="middle" fontFamily="Nunito, sans-serif" fontSize={13} fontWeight={800} fill="#3d4a35">S</text>
-        <text x={-56} y={5} textAnchor="middle" fontFamily="Nunito, sans-serif" fontSize={13} fontWeight={800} fill="#3d4a35">W</text>
-        <text x={56} y={5} textAnchor="middle" fontFamily="Nunito, sans-serif" fontSize={13} fontWeight={800} fill="#3d4a35">O</text>
-      </g>
     </svg>
   );
 }

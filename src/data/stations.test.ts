@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { STATIONS } from "./stations";
+import { CHILDREN, FIXED_ASSIGNMENTS, STATIONS } from "./stations";
 
 describe("STATIONS data", () => {
   it("contains exactly eight stations", () => {
@@ -23,16 +23,14 @@ describe("STATIONS data", () => {
     }
   });
 
-  it("marks only station 8 (Michel) as the treasure", () => {
+  it("marks only station 8 as the treasure", () => {
     const treasures = STATIONS.filter((s) => s.isTreasure);
     expect(treasures).toHaveLength(1);
     expect(treasures[0].id).toBe(8);
-    expect(treasures[0].childName).toBe("Michel");
   });
 
   it("fills the required text fields", () => {
     for (const s of STATIONS) {
-      expect(s.childName, `station ${s.id} childName`).toBeTruthy();
       expect(s.scarfColor, `station ${s.id} scarfColor`).toMatch(/^#[0-9a-f]{6}$/i);
       expect(s.scarfColorLabel, `station ${s.id} scarfColorLabel`).toBeTruthy();
       expect(s.question, `station ${s.id} question`).toBeTruthy();
@@ -55,24 +53,49 @@ describe("STATIONS data", () => {
     }
   });
 
-  it("matches the child / direction / scarf chain", () => {
+  it("matches the direction / scarf chain per slot", () => {
     const expected = [
-      { id: 1, childName: "Finja", directionShort: null, scarfColorLabel: "rosa" },
-      { id: 2, childName: "Lina", directionShort: "O", scarfColorLabel: "hellblaue" },
-      { id: 3, childName: "Friedi", directionShort: "SW", scarfColorLabel: "rote" },
-      { id: 4, childName: "Fiete", directionShort: "SW", scarfColorLabel: "lila" },
-      { id: 5, childName: "Esmee", directionShort: "W", scarfColorLabel: "gelbe" },
-      { id: 6, childName: "Ronja", directionShort: "SO", scarfColorLabel: "orange" },
-      { id: 7, childName: "Milla", directionShort: "NO", scarfColorLabel: "grüne" },
-      { id: 8, childName: "Michel", directionShort: "N", scarfColorLabel: "dunkelblaue" },
+      { id: 1, directionShort: null, scarfColorLabel: "rosa" },
+      { id: 2, directionShort: "O", scarfColorLabel: "hellblaue" },
+      { id: 3, directionShort: "SW", scarfColorLabel: "rote" },
+      { id: 4, directionShort: "SW", scarfColorLabel: "lila" },
+      { id: 5, directionShort: "W", scarfColorLabel: "gelbe" },
+      { id: 6, directionShort: "SO", scarfColorLabel: "orange" },
+      { id: 7, directionShort: "NO", scarfColorLabel: "grüne" },
+      { id: 8, directionShort: "N", scarfColorLabel: "dunkelblaue" },
     ];
     expect(
       STATIONS.map((s) => ({
         id: s.id,
-        childName: s.childName,
         directionShort: s.directionShort,
         scarfColorLabel: s.scarfColorLabel,
       })),
     ).toEqual(expected);
+  });
+});
+
+describe("CHILDREN list", () => {
+  it("contains exactly the 8 expected names in order", () => {
+    expect(CHILDREN).toEqual([
+      "Finja",
+      "Lina",
+      "Friedi",
+      "Fiete",
+      "Esmee",
+      "Ronja",
+      "Milla",
+      "Michel",
+    ]);
+  });
+
+  it("locks Milla to slot 1 and Michel to slot 8 in FIXED_ASSIGNMENTS", () => {
+    expect(FIXED_ASSIGNMENTS.Milla).toBe(1);
+    expect(FIXED_ASSIGNMENTS.Michel).toBe(8);
+  });
+
+  it("leaves the other 6 children unfixed (null)", () => {
+    for (const name of ["Finja", "Lina", "Friedi", "Fiete", "Esmee", "Ronja"] as const) {
+      expect(FIXED_ASSIGNMENTS[name], name).toBeNull();
+    }
   });
 });

@@ -4,10 +4,23 @@ import { describe, it, expect, beforeEach } from "vitest";
 import App from "./App";
 
 const STORAGE_KEY = "treasure-hunt:progress";
+const ASSIGNMENTS_KEY = "treasure-hunt:assignments";
+
+const FULL_ASSIGNMENTS = {
+  1: "Milla",
+  2: "Finja",
+  3: "Lina",
+  4: "Friedi",
+  5: "Fiete",
+  6: "Esmee",
+  7: "Ronja",
+  8: "Michel",
+};
 
 describe("App", () => {
   beforeEach(() => {
     localStorage.clear();
+    localStorage.setItem(ASSIGNMENTS_KEY, JSON.stringify(FULL_ASSIGNMENTS));
   });
 
   it("renders the map with all eight station markers", () => {
