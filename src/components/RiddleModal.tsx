@@ -388,37 +388,41 @@ function CelebrateView({ station, onContinue }: CelebrateProps) {
           fontWeight: 600,
         }}
       >
-        {station.childName}, dein Tuch ist im …
+        {station.directionShort
+          ? `${station.childName}, dein Tuch ist im …`
+          : `${station.childName}, hier ist dein Tuch!`}
       </div>
 
-      <div
-        data-testid="direction-label"
-        className="direction-pulse"
-        style={{
-          position: "relative",
-          marginTop: 18,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <DirectionDial dirShort={station.directionShort} />
-        <span aria-hidden="true" style={{ position: "absolute", left: -9999 }}>
-          {getArrowGlyph(station.directionShort)}
-        </span>
+      {station.directionShort && (
         <div
+          data-testid="direction-label"
+          className="direction-pulse"
           style={{
-            fontFamily: "Nunito, sans-serif",
-            fontSize: 40,
-            fontWeight: 900,
-            color: "#3d4a35",
-            letterSpacing: 2,
-            marginTop: 6,
+            position: "relative",
+            marginTop: 18,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
           }}
         >
-          {station.direction}
+          <DirectionDial dirShort={station.directionShort} />
+          <span aria-hidden="true" style={{ position: "absolute", left: -9999 }}>
+            {getArrowGlyph(station.directionShort)}
+          </span>
+          <div
+            style={{
+              fontFamily: "Nunito, sans-serif",
+              fontSize: 40,
+              fontWeight: 900,
+              color: "#3d4a35",
+              letterSpacing: 2,
+              marginTop: 6,
+            }}
+          >
+            {station.direction}
+          </div>
         </div>
-      </div>
+      )}
 
       <div
         style={{

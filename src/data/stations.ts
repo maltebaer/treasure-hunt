@@ -9,8 +9,8 @@ export type Station = {
   childName: string;
   scarfColor: string;
   scarfColorLabel: string;
-  direction: string;
-  directionShort: string;
+  direction: string | null;
+  directionShort: string | null;
   isTreasure: boolean;
   question: string;
   options: Option[];
@@ -23,8 +23,8 @@ export const STATIONS: Station[] = [
     childName: "Finja",
     scarfColor: "#f4a8c4",
     scarfColorLabel: "rosa",
-    direction: "NORDWEST",
-    directionShort: "NW",
+    direction: null,
+    directionShort: null,
     isTreasure: false,
     question:
       "Drei Äpfel hängen am Baum. Vier kommen dazu. Wie viele sind es jetzt?",

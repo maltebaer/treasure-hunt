@@ -35,9 +35,14 @@ describe("STATIONS data", () => {
       expect(s.childName, `station ${s.id} childName`).toBeTruthy();
       expect(s.scarfColor, `station ${s.id} scarfColor`).toMatch(/^#[0-9a-f]{6}$/i);
       expect(s.scarfColorLabel, `station ${s.id} scarfColorLabel`).toBeTruthy();
-      expect(s.direction, `station ${s.id} direction`).toBeTruthy();
-      expect(s.directionShort, `station ${s.id} directionShort`).toBeTruthy();
       expect(s.question, `station ${s.id} question`).toBeTruthy();
+      if (s.id === 1) {
+        expect(s.direction, `station ${s.id} direction`).toBeNull();
+        expect(s.directionShort, `station ${s.id} directionShort`).toBeNull();
+      } else {
+        expect(s.direction, `station ${s.id} direction`).toBeTruthy();
+        expect(s.directionShort, `station ${s.id} directionShort`).toBeTruthy();
+      }
     }
   });
 
@@ -52,7 +57,7 @@ describe("STATIONS data", () => {
 
   it("matches the child / direction / scarf chain", () => {
     const expected = [
-      { id: 1, childName: "Finja", directionShort: "NW", scarfColorLabel: "rosa" },
+      { id: 1, childName: "Finja", directionShort: null, scarfColorLabel: "rosa" },
       { id: 2, childName: "Lina", directionShort: "O", scarfColorLabel: "hellblaue" },
       { id: 3, childName: "Friedi", directionShort: "SW", scarfColorLabel: "rote" },
       { id: 4, childName: "Fiete", directionShort: "SW", scarfColorLabel: "lila" },

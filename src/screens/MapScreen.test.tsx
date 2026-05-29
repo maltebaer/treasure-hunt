@@ -165,18 +165,38 @@ describe("MapScreen", () => {
     expect(
       within(dialog).queryByRole("button", { name: /Sieben/i }),
     ).not.toBeInTheDocument();
-    expect(within(dialog).getByTestId("direction-label")).toBeInTheDocument();
+    expect(
+      within(dialog).getByRole("button", { name: /Tuch gefunden/i }),
+    ).toBeInTheDocument();
   });
 
-  it("renders the direction arrow + word with pulse animation in the success view", async () => {
+  it("station 1 success view does not render a direction-label", async () => {
     const user = userEvent.setup();
     renderWithProgress(<MapScreen />);
     await user.click(screen.getByTestId("station-marker-1"));
     const dialog = screen.getByRole("dialog");
     await user.click(within(dialog).getByRole("button", { name: /Sieben/i }));
+    expect(
+      within(dialog).queryByTestId("direction-label"),
+    ).not.toBeInTheDocument();
+    expect(
+      within(dialog).getByRole("button", { name: /Tuch gefunden/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("station 2 success view renders the direction arrow + word with pulse animation", async () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ solvedStations: [1] }),
+    );
+    const user = userEvent.setup();
+    renderWithProgress(<MapScreen />);
+    await user.click(screen.getByTestId("station-marker-2"));
+    const dialog = screen.getByRole("dialog");
+    await user.click(within(dialog).getByRole("button", { name: /Drei/i }));
     const directionLabel = within(dialog).getByTestId("direction-label");
-    expect(directionLabel).toHaveTextContent("↖");
-    expect(directionLabel).toHaveTextContent("NORDWEST");
+    expect(directionLabel).toHaveTextContent("→");
+    expect(directionLabel).toHaveTextContent("OSTEN");
     expect(directionLabel.className).toMatch(/direction-pulse/);
   });
 
