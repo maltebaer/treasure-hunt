@@ -114,7 +114,7 @@ export const STATIONS: Station[] = [
       { emoji: "🟠", label: "Orange", correct: false },
       { emoji: "🟣", label: "Lila", correct: false },
     ],
-    markerPosition: { x: 40, y: 68 },
+    markerPosition: { x: 17, y: 60 },
   },
   {
     id: 7,
@@ -130,7 +130,7 @@ export const STATIONS: Station[] = [
       { emoji: "🐻", label: "Berlin", correct: true },
       { emoji: "⚓", label: "Hamburg", correct: false },
     ],
-    markerPosition: { x: 15, y: 75 },
+    markerPosition: { x: 25, y: 75 },
   },
   {
     id: 8,
