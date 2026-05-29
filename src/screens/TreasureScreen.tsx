@@ -167,7 +167,7 @@ export default function TreasureScreen({ onViewMap }: Props) {
         >
           Alles Gute zum Geburtstag, Michel <span aria-hidden="true">🎂</span>
           <br />
-          Alle sieben Stationen gemeistert. Ihr seid{" "}
+          Alle acht Stationen gemeistert. Ihr seid{" "}
           <strong style={{ color: "#7a5a3d" }}>Schatzsuch-Profis</strong>!
         </p>
 

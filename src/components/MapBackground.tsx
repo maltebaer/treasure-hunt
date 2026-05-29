@@ -5,7 +5,11 @@ const VB_W = 700;
 const VB_H = 1000;
 const TREASURE = { x: 380, y: 870 };
 
-export default function MapBackground() {
+type Props = {
+  treasureRevealed?: boolean;
+};
+
+export default function MapBackground({ treasureRevealed = false }: Props) {
   const points = STATIONS.map((s) => ({
     x: (s.markerPosition.x / 100) * VB_W,
     y: (s.markerPosition.y / 100) * VB_H,
@@ -62,7 +66,11 @@ export default function MapBackground() {
         });
       })}
 
-      <g transform={`translate(${TREASURE.x},${TREASURE.y})`} opacity={0.5}>
+      <g
+        data-testid="map-treasure"
+        transform={`translate(${TREASURE.x},${TREASURE.y})`}
+        opacity={treasureRevealed ? 1 : 0.5}
+      >
         <WCSplash cx={0} cy={0} r={50} fill="#c89a3f" seed={40} opacity={0.5} />
         <rect x={-30} y={-20} width={60} height={38} rx={5} fill="#a87938" filter="url(#wc-wobble)" />
         <rect x={-30} y={-20} width={60} height={12} rx={3} fill="#7a5a28" filter="url(#wc-wobble)" />

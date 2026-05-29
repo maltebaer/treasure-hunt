@@ -114,7 +114,7 @@ export default function AdminMenu({ onClose }: Props) {
             lineHeight: 1.5,
           }}
         >
-          Fortschritt: <strong>{solvedStations.length} / 7</strong> Stationen
+          Fortschritt: <strong>{solvedStations.length} / {STATIONS.length}</strong> Stationen
           {currentKid && (
             <>
               {" "}· Aktuell{" "}
@@ -141,7 +141,7 @@ export default function AdminMenu({ onClose }: Props) {
           >
             Zu Station springen
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 8 }}>
+          <div style={{ display: "grid", gridTemplateColumns: `repeat(${STATIONS.length}, 1fr)`, gap: 8 }}>
             {STATIONS.map((s) => {
               const isCurrent = s.id === currentStation;
               return (

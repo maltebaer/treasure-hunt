@@ -13,13 +13,14 @@ vi.mock("../lib/confetti", () => ({
 const STORAGE_KEY = "treasure-hunt:progress";
 
 const CORRECT_OPTION_LABEL: Record<number, RegExp> = {
-  1: /Biene/i,
-  2: /Orange/i,
-  3: /Rotkäppchen/i,
-  4: /Acht/i,
-  5: /Kuh/i,
-  6: /Äpfel/i,
-  7: /Schatz/i,
+  1: /Sieben/i,
+  2: /Drei/i,
+  3: /Loch/i,
+  4: /Blauwal/i,
+  5: /Sieben/i,
+  6: /Grün/i,
+  7: /Berlin/i,
+  8: /Zehn/i,
 };
 
 async function solveStation(
@@ -42,9 +43,9 @@ describe("MapScreen", () => {
     vi.mocked(burst).mockClear();
   });
 
-  it("renders seven station markers", () => {
+  it("renders eight station markers", () => {
     renderWithProgress(<MapScreen />);
-    for (let id = 1; id <= 7; id++) {
+    for (let id = 1; id <= 8; id++) {
       expect(screen.getByTestId(`station-marker-${id}`)).toBeInTheDocument();
     }
   });
@@ -56,10 +57,10 @@ describe("MapScreen", () => {
     ).toBeInTheDocument();
   });
 
-  it("enables only marker 1 and disables markers 2-7 at the start", () => {
+  it("enables only marker 1 and disables markers 2-8 at the start", () => {
     renderWithProgress(<MapScreen />);
     expect(screen.getByTestId("station-marker-1")).toBeEnabled();
-    for (let id = 2; id <= 7; id++) {
+    for (let id = 2; id <= 8; id++) {
       expect(screen.getByTestId(`station-marker-${id}`)).toBeDisabled();
     }
   });
@@ -71,7 +72,7 @@ describe("MapScreen", () => {
     await user.click(screen.getByTestId("station-marker-1"));
     const dialog = screen.getByRole("dialog");
     expect(dialog).toBeInTheDocument();
-    expect(within(dialog).getByText(/Honig/i)).toBeInTheDocument();
+    expect(within(dialog).getByText(/Drei Äpfel/i)).toBeInTheDocument();
   });
 
   it("closes the modal without solving when the close button is tapped", async () => {
@@ -122,7 +123,7 @@ describe("MapScreen", () => {
     renderWithProgress(<MapScreen />);
     await user.click(screen.getByTestId("station-marker-1"));
     const dialog = screen.getByRole("dialog");
-    await user.click(within(dialog).getByRole("button", { name: /Biene/i }));
+    await user.click(within(dialog).getByRole("button", { name: /Sieben/i }));
     expect(burst).toHaveBeenCalledTimes(1);
   });
 
@@ -132,7 +133,7 @@ describe("MapScreen", () => {
     await user.click(screen.getByTestId("station-marker-1"));
     const dialog = screen.getByRole("dialog");
     await user.click(
-      within(dialog).getByRole("button", { name: /Marienkäfer/i }),
+      within(dialog).getByRole("button", { name: /Sechs/i }),
     );
     expect(burst).not.toHaveBeenCalled();
   });
@@ -144,7 +145,7 @@ describe("MapScreen", () => {
     await user.click(screen.getByTestId("station-marker-1"));
     const dialog = screen.getByRole("dialog");
     const wrong = within(dialog).getByRole("button", {
-      name: /Marienkäfer/i,
+      name: /Sechs/i,
     });
     await user.click(wrong);
     expect(wrong.className).toMatch(/shaking/);
@@ -160,34 +161,11 @@ describe("MapScreen", () => {
     renderWithProgress(<MapScreen />);
     await user.click(screen.getByTestId("station-marker-1"));
     const dialog = screen.getByRole("dialog");
-    await user.click(within(dialog).getByRole("button", { name: /Biene/i }));
+    await user.click(within(dialog).getByRole("button", { name: /Sieben/i }));
     expect(
-      within(dialog).queryByRole("button", { name: /Biene/i }),
+      within(dialog).queryByRole("button", { name: /Sieben/i }),
     ).not.toBeInTheDocument();
     expect(within(dialog).getByTestId("direction-label")).toBeInTheDocument();
-  });
-
-  it("renders no direction arrow before any station is solved", () => {
-    renderWithProgress(<MapScreen />);
-    expect(screen.queryByTestId("direction-arrow")).not.toBeInTheDocument();
-  });
-
-  it("renders a direction arrow between last-solved and active marker", () => {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ solvedStations: [1] }),
-    );
-    renderWithProgress(<MapScreen />);
-    expect(screen.getByTestId("direction-arrow")).toBeInTheDocument();
-  });
-
-  it("renders no direction arrow when all stations are solved", () => {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ solvedStations: [1, 2, 3, 4, 5, 6, 7] }),
-    );
-    renderWithProgress(<MapScreen />);
-    expect(screen.queryByTestId("direction-arrow")).not.toBeInTheDocument();
   });
 
   it("renders the direction arrow + word with pulse animation in the success view", async () => {
@@ -195,11 +173,28 @@ describe("MapScreen", () => {
     renderWithProgress(<MapScreen />);
     await user.click(screen.getByTestId("station-marker-1"));
     const dialog = screen.getByRole("dialog");
-    await user.click(within(dialog).getByRole("button", { name: /Biene/i }));
+    await user.click(within(dialog).getByRole("button", { name: /Sieben/i }));
     const directionLabel = within(dialog).getByTestId("direction-label");
     expect(directionLabel).toHaveTextContent("↖");
     expect(directionLabel).toHaveTextContent("NORDWEST");
     expect(directionLabel.className).toMatch(/direction-pulse/);
+  });
+
+  it("treasure on map is dimmed (opacity 0.5) before final station is solved", () => {
+    renderWithProgress(<MapScreen />);
+    expect(screen.getByTestId("map-treasure")).toHaveAttribute(
+      "opacity",
+      "0.5",
+    );
+  });
+
+  it("treasure on map is fully revealed (opacity 1) after final station is solved", () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ solvedStations: [1, 2, 3, 4, 5, 6, 7, 8] }),
+    );
+    renderWithProgress(<MapScreen />);
+    expect(screen.getByTestId("map-treasure")).toHaveAttribute("opacity", "1");
   });
 
   it("opens the admin menu after holding the title for 1500ms", () => {
@@ -226,6 +221,21 @@ describe("MapScreen", () => {
       vi.advanceTimersByTime(1000);
     });
     expect(screen.queryByTestId("admin-menu")).not.toBeInTheDocument();
+    vi.useRealTimers();
+  });
+
+  it("admin menu renders 8 jump-to-station buttons", () => {
+    vi.useFakeTimers();
+    renderWithProgress(<MapScreen />);
+    fireEvent.mouseDown(screen.getByTestId("map-title"));
+    act(() => {
+      vi.advanceTimersByTime(1500);
+    });
+    for (let id = 1; id <= 8; id++) {
+      expect(
+        screen.getByRole("button", { name: new RegExp(`Springe zu Station ${id}`, "i") }),
+      ).toBeInTheDocument();
+    }
     vi.useRealTimers();
   });
 

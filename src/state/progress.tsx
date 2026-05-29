@@ -8,7 +8,7 @@ import {
 } from "react";
 
 const STORAGE_KEY = "treasure-hunt:progress";
-export const TOTAL_STATIONS = 7;
+export const TOTAL_STATIONS = 8;
 
 export type Progress = {
   solvedStations: number[];

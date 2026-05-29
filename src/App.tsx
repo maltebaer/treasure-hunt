@@ -2,6 +2,7 @@ import { useState } from "react";
 import MapScreen from "./screens/MapScreen";
 import TreasureScreen from "./screens/TreasureScreen";
 import { ProgressProvider, useProgress } from "./state/progress";
+import { STATIONS } from "./data/stations";
 
 export default function App() {
   return (
@@ -15,7 +16,7 @@ function AppShell() {
   const { solvedStations } = useProgress();
   const [viewingMap, setViewingMap] = useState(false);
 
-  const allSolved = solvedStations.length === 7;
+  const allSolved = solvedStations.length === STATIONS.length;
 
   if (allSolved && !viewingMap) {
     return <TreasureScreen onViewMap={() => setViewingMap(true)} />;

@@ -25,6 +25,8 @@ Each issue is a thin, vertical slice: it touches all relevant layers (UI, state,
 10. `10-map-background-art.md` — Hand-drawn-style placeholder background
 11. `11-pwa-offline.md` — Service worker, manifest, installable, offline
 12. `12-admin-reset.md` — Long-press admin menu (reset, skip, jump)
+13. `13-watercolor-design.md` — Watercolor design pass (committed; no issue file)
+14. `14-milla-station-colors-difficulty.md` — 8th station (Milla), treasure reveal, new color palette, harder riddles
 
 ## Conventions
 

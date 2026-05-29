@@ -2,12 +2,12 @@ import { describe, it, expect } from "vitest";
 import { STATIONS } from "./stations";
 
 describe("STATIONS data", () => {
-  it("contains exactly seven stations", () => {
-    expect(STATIONS).toHaveLength(7);
+  it("contains exactly eight stations", () => {
+    expect(STATIONS).toHaveLength(8);
   });
 
-  it("uses consecutive IDs 1-7", () => {
-    expect(STATIONS.map((s) => s.id)).toEqual([1, 2, 3, 4, 5, 6, 7]);
+  it("uses consecutive IDs 1-8", () => {
+    expect(STATIONS.map((s) => s.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
   });
 
   it("has exactly three options per station", () => {
@@ -23,10 +23,11 @@ describe("STATIONS data", () => {
     }
   });
 
-  it("marks only station 7 as the treasure", () => {
+  it("marks only station 8 (Michel) as the treasure", () => {
     const treasures = STATIONS.filter((s) => s.isTreasure);
     expect(treasures).toHaveLength(1);
-    expect(treasures[0].id).toBe(7);
+    expect(treasures[0].id).toBe(8);
+    expect(treasures[0].childName).toBe("Michel");
   });
 
   it("fills the required text fields", () => {
@@ -49,15 +50,16 @@ describe("STATIONS data", () => {
     }
   });
 
-  it("matches the PRD child / direction / scarf chain", () => {
+  it("matches the child / direction / scarf chain", () => {
     const expected = [
-      { id: 1, childName: "Finja", directionShort: "NW", scarfColorLabel: "rote" },
-      { id: 2, childName: "Lina", directionShort: "O", scarfColorLabel: "blaue" },
-      { id: 3, childName: "Friedi", directionShort: "SW", scarfColorLabel: "gelbe" },
-      { id: 4, childName: "Fiete", directionShort: "SW", scarfColorLabel: "grüne" },
-      { id: 5, childName: "Esmee", directionShort: "W", scarfColorLabel: "orange" },
-      { id: 6, childName: "Ronja", directionShort: "SO", scarfColorLabel: "lila" },
-      { id: 7, childName: "Michel", directionShort: "N", scarfColorLabel: "goldene" },
+      { id: 1, childName: "Finja", directionShort: "NW", scarfColorLabel: "rosa" },
+      { id: 2, childName: "Lina", directionShort: "O", scarfColorLabel: "hellblaue" },
+      { id: 3, childName: "Friedi", directionShort: "SW", scarfColorLabel: "rote" },
+      { id: 4, childName: "Fiete", directionShort: "SW", scarfColorLabel: "lila" },
+      { id: 5, childName: "Esmee", directionShort: "W", scarfColorLabel: "gelbe" },
+      { id: 6, childName: "Ronja", directionShort: "SO", scarfColorLabel: "orange" },
+      { id: 7, childName: "Milla", directionShort: "NO", scarfColorLabel: "grüne" },
+      { id: 8, childName: "Michel", directionShort: "N", scarfColorLabel: "dunkelblaue" },
     ];
     expect(
       STATIONS.map((s) => ({

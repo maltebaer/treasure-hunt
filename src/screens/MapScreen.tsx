@@ -48,31 +48,6 @@ export default function MapScreen() {
     }
   }
 
-  const lastSolvedId =
-    solvedStations.length > 0 ? Math.max(...solvedStations) : null;
-  const lastSolved =
-    lastSolvedId !== null
-      ? (STATIONS.find((s) => s.id === lastSolvedId) ?? null)
-      : null;
-  const nextStation =
-    currentStation !== null
-      ? (STATIONS.find((s) => s.id === currentStation) ?? null)
-      : null;
-
-  let arrow:
-    | { x: number; y: number; angle: number; color: string }
-    | null = null;
-  if (lastSolved && nextStation) {
-    const mx =
-      (lastSolved.markerPosition.x + nextStation.markerPosition.x) / 2;
-    const my =
-      (lastSolved.markerPosition.y + nextStation.markerPosition.y) / 2;
-    const dx = nextStation.markerPosition.x - lastSolved.markerPosition.x;
-    const dy = nextStation.markerPosition.y - lastSolved.markerPosition.y;
-    const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
-    arrow = { x: mx, y: my, angle, color: nextStation.scarfColor };
-  }
-
   return (
     <main
       data-testid="map-screen"
@@ -86,7 +61,9 @@ export default function MapScreen() {
       }}
     >
       <WatercolorDefs />
-      <MapBackground />
+      <MapBackground
+        treasureRevealed={solvedStations.includes(STATIONS.at(-1)!.id)}
+      />
 
       <header
         style={{
@@ -189,53 +166,6 @@ export default function MapScreen() {
           onClick={() => setOpenStationId(s.id)}
         />
       ))}
-
-      {arrow && (
-        <div
-          data-testid="direction-arrow"
-          aria-hidden="true"
-          className="direction-pulse"
-          style={{
-            position: "absolute",
-            left: `${arrow.x}%`,
-            top: `${arrow.y}%`,
-            transform: `translate(-50%, -50%) rotate(${arrow.angle}deg)`,
-            fontSize: "2.4rem",
-            color: arrow.color,
-            textShadow:
-              "0 0 4px #fbf6ec, 0 0 4px #fbf6ec, 0 0 4px #fbf6ec",
-            pointerEvents: "none",
-            zIndex: 1,
-            fontWeight: 900,
-          }}
-        >
-          →
-        </div>
-      )}
-
-      {nextStation && !openStation && !adminOpen && (
-        <footer
-          style={{
-            position: "absolute",
-            bottom: 18,
-            left: 160,
-            right: 22,
-            textAlign: "center",
-            fontFamily: "Nunito, sans-serif",
-            fontSize: 14,
-            color: "#7a6f56",
-            fontWeight: 600,
-            zIndex: 1,
-            pointerEvents: "none",
-          }}
-        >
-          Folge den Steinen zu{" "}
-          <span style={{ color: nextStation.scarfColor, fontWeight: 800 }}>
-            {nextStation.childName}s
-          </span>{" "}
-          Station
-        </footer>
-      )}
 
       {openStation && (
         <RiddleModal
