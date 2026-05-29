@@ -77,24 +77,24 @@ describe("STATIONS data", () => {
 describe("CHILDREN list", () => {
   it("contains exactly the 8 expected names in order", () => {
     expect(CHILDREN).toEqual([
-      "Finja",
-      "Lina",
-      "Friedi",
-      "Fiete",
-      "Esmee",
-      "Ronja",
-      "Milla",
-      "Michel",
+      "FINJA",
+      "LINA",
+      "FRIEDI",
+      "FIETE",
+      "ESMEE",
+      "RONJA",
+      "MILLA",
+      "MICHEL",
     ]);
   });
 
-  it("locks Milla to slot 1 and Michel to slot 8 in FIXED_ASSIGNMENTS", () => {
-    expect(FIXED_ASSIGNMENTS.Milla).toBe(1);
-    expect(FIXED_ASSIGNMENTS.Michel).toBe(8);
+  it("locks MILLA to slot 1 and MICHEL to slot 8 in FIXED_ASSIGNMENTS", () => {
+    expect(FIXED_ASSIGNMENTS.MILLA).toBe(1);
+    expect(FIXED_ASSIGNMENTS.MICHEL).toBe(8);
   });
 
   it("leaves the other 6 children unfixed (null)", () => {
-    for (const name of ["Finja", "Lina", "Friedi", "Fiete", "Esmee", "Ronja"] as const) {
+    for (const name of ["FINJA", "LINA", "FRIEDI", "FIETE", "ESMEE", "RONJA"] as const) {
       expect(FIXED_ASSIGNMENTS[name], name).toBeNull();
     }
   });

@@ -14,14 +14,14 @@ const STORAGE_KEY = "treasure-hunt:progress";
 const ASSIGNMENTS_KEY = "treasure-hunt:assignments";
 
 const FULL_ASSIGNMENTS: Record<number, string> = {
-  1: "Milla",
-  2: "Finja",
-  3: "Lina",
-  4: "Friedi",
-  5: "Fiete",
-  6: "Esmee",
-  7: "Ronja",
-  8: "Michel",
+  1: "MILLA",
+  2: "FINJA",
+  3: "LINA",
+  4: "FRIEDI",
+  5: "FIETE",
+  6: "ESMEE",
+  7: "RONJA",
+  8: "MICHEL",
 };
 
 function seedAssignments() {
@@ -105,7 +105,7 @@ describe("MapScreen", () => {
     );
   });
 
-  it("activates marker 2 (Lina) after marker 1 is solved", async () => {
+  it("activates marker 2 (LINA) after marker 1 is solved", async () => {
     const user = userEvent.setup();
     renderWithProgress(<MapScreen />);
     await solveStation(user, 1);
@@ -120,7 +120,7 @@ describe("MapScreen", () => {
     expect(screen.getByTestId("station-marker-2")).toBeEnabled();
   });
 
-  it("activates marker 3 (Friedi) after marker 2 is solved", async () => {
+  it("activates marker 3 (FRIEDI) after marker 2 is solved", async () => {
     localStorage.setItem(
       STORAGE_KEY,
       JSON.stringify({ solvedStations: [1] }),
@@ -412,7 +412,7 @@ describe("MapScreen", () => {
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     });
 
-    it("clicking Milla in the modal assigns slot 1 after the spin", async () => {
+    it("clicking MILLA in the modal assigns slot 1 after the spin", async () => {
       localStorage.removeItem(ASSIGNMENTS_KEY);
       vi.useFakeTimers({ shouldAdvanceTime: true });
       const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
@@ -420,17 +420,17 @@ describe("MapScreen", () => {
       await user.click(
         screen.getByRole("button", { name: /Glücksrad öffnen/i }),
       );
-      await user.click(screen.getByRole("button", { name: /Milla zuweisen/i }));
+      await user.click(screen.getByRole("button", { name: /MILLA zuweisen/i }));
       act(() => {
         vi.advanceTimersByTime(1600);
       });
       const stored = JSON.parse(localStorage.getItem(ASSIGNMENTS_KEY) ?? "{}");
-      expect(stored[1]).toBe("Milla");
-      expect(screen.getByTestId("station-marker-1")).toHaveTextContent("Milla");
+      expect(stored[1]).toBe("MILLA");
+      expect(screen.getByTestId("station-marker-1")).toHaveTextContent("MILLA");
       vi.useRealTimers();
     });
 
-    it("clicking Michel in the modal assigns slot 8 after the spin", async () => {
+    it("clicking MICHEL in the modal assigns slot 8 after the spin", async () => {
       localStorage.removeItem(ASSIGNMENTS_KEY);
       vi.useFakeTimers({ shouldAdvanceTime: true });
       const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
@@ -439,13 +439,13 @@ describe("MapScreen", () => {
         screen.getByRole("button", { name: /Glücksrad öffnen/i }),
       );
       await user.click(
-        screen.getByRole("button", { name: /Michel zuweisen/i }),
+        screen.getByRole("button", { name: /MICHEL zuweisen/i }),
       );
       act(() => {
         vi.advanceTimersByTime(1600);
       });
       const stored = JSON.parse(localStorage.getItem(ASSIGNMENTS_KEY) ?? "{}");
-      expect(stored[8]).toBe("Michel");
+      expect(stored[8]).toBe("MICHEL");
       vi.useRealTimers();
     });
 
@@ -456,7 +456,7 @@ describe("MapScreen", () => {
         screen.getByRole("button", { name: /Glücksrad öffnen/i }),
       );
       expect(
-        screen.getByRole("button", { name: /Milla zuweisen/i }),
+        screen.getByRole("button", { name: /MILLA zuweisen/i }),
       ).toBeDisabled();
     });
 

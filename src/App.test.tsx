@@ -7,14 +7,14 @@ const STORAGE_KEY = "treasure-hunt:progress";
 const ASSIGNMENTS_KEY = "treasure-hunt:assignments";
 
 const FULL_ASSIGNMENTS = {
-  1: "Milla",
-  2: "Finja",
-  3: "Lina",
-  4: "Friedi",
-  5: "Fiete",
-  6: "Esmee",
-  7: "Ronja",
-  8: "Michel",
+  1: "MILLA",
+  2: "FINJA",
+  3: "LINA",
+  4: "FRIEDI",
+  5: "FIETE",
+  6: "ESMEE",
+  7: "RONJA",
+  8: "MICHEL",
 };
 
 describe("App", () => {

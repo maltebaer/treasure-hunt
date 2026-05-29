@@ -174,28 +174,28 @@ describe("useProgress (via ProgressProvider)", () => {
 });
 
 describe("pickSlotForName", () => {
-  it("returns 1 for Milla", () => {
-    expect(pickSlotForName("Milla", {})).toBe(1);
+  it("returns 1 for MILLA", () => {
+    expect(pickSlotForName("MILLA", {})).toBe(1);
   });
 
-  it("returns 8 for Michel", () => {
-    expect(pickSlotForName("Michel", {})).toBe(8);
+  it("returns 8 for MICHEL", () => {
+    expect(pickSlotForName("MICHEL", {})).toBe(8);
   });
 
   it("returns null if name is already assigned", () => {
-    expect(pickSlotForName("Milla", { 1: "Milla" })).toBeNull();
+    expect(pickSlotForName("MILLA", { 1: "MILLA" })).toBeNull();
   });
 
   it("picks deterministically with a seeded random fn", () => {
-    expect(pickSlotForName("Finja", {}, () => 0)).toBe(2);
-    expect(pickSlotForName("Finja", {}, () => 0.999)).toBe(7);
+    expect(pickSlotForName("FINJA", {}, () => 0)).toBe(2);
+    expect(pickSlotForName("FINJA", {}, () => 0.999)).toBe(7);
   });
 
   it("skips slots that are already taken", () => {
     expect(
       pickSlotForName(
-        "Finja",
-        { 2: "Lina", 3: "Friedi", 4: "Fiete" },
+        "FINJA",
+        { 2: "LINA", 3: "FRIEDI", 4: "FIETE" },
         () => 0,
       ),
     ).toBe(5);
@@ -211,31 +211,31 @@ describe("assignments lifecycle", () => {
     const { result } = renderHook(() => useProgress(), {
       wrapper: ProgressProvider,
     });
-    act(() => result.current.commitAssignment(1, "Milla"));
-    expect(result.current.assignments).toEqual({ 1: "Milla" });
-    expect(loadAssignments()).toEqual({ 1: "Milla" });
+    act(() => result.current.commitAssignment(1, "MILLA"));
+    expect(result.current.assignments).toEqual({ 1: "MILLA" });
+    expect(loadAssignments()).toEqual({ 1: "MILLA" });
   });
 
   it("commit is a no-op when slot already taken", () => {
     const { result } = renderHook(() => useProgress(), {
       wrapper: ProgressProvider,
     });
-    act(() => result.current.commitAssignment(1, "Milla"));
-    act(() => result.current.commitAssignment(1, "Finja"));
-    expect(result.current.assignments).toEqual({ 1: "Milla" });
+    act(() => result.current.commitAssignment(1, "MILLA"));
+    act(() => result.current.commitAssignment(1, "FINJA"));
+    expect(result.current.assignments).toEqual({ 1: "MILLA" });
   });
 
   it("commit is a no-op when name already assigned to another slot", () => {
     const { result } = renderHook(() => useProgress(), {
       wrapper: ProgressProvider,
     });
-    act(() => result.current.commitAssignment(2, "Finja"));
-    act(() => result.current.commitAssignment(3, "Finja"));
-    expect(result.current.assignments).toEqual({ 2: "Finja" });
+    act(() => result.current.commitAssignment(2, "FINJA"));
+    act(() => result.current.commitAssignment(3, "FINJA"));
+    expect(result.current.assignments).toEqual({ 2: "FINJA" });
   });
 
   it("resetAssignments wipes the slice", () => {
-    localStorage.setItem(ASSIGNMENTS_KEY, JSON.stringify({ 1: "Milla" }));
+    localStorage.setItem(ASSIGNMENTS_KEY, JSON.stringify({ 1: "MILLA" }));
     const { result } = renderHook(() => useProgress(), {
       wrapper: ProgressProvider,
     });
@@ -251,7 +251,7 @@ describe("assignments lifecycle", () => {
     );
     localStorage.setItem(
       ASSIGNMENTS_KEY,
-      JSON.stringify({ 1: "Milla", 2: "Finja" }),
+      JSON.stringify({ 1: "MILLA", 2: "FINJA" }),
     );
     const { result } = renderHook(() => useProgress(), {
       wrapper: ProgressProvider,
@@ -265,11 +265,11 @@ describe("assignments lifecycle", () => {
   it("hydrates assignments from localStorage on mount", () => {
     localStorage.setItem(
       ASSIGNMENTS_KEY,
-      JSON.stringify({ 1: "Milla", 8: "Michel" }),
+      JSON.stringify({ 1: "MILLA", 8: "MICHEL" }),
     );
     const { result } = renderHook(() => useProgress(), {
       wrapper: ProgressProvider,
     });
-    expect(result.current.assignments).toEqual({ 1: "Milla", 8: "Michel" });
+    expect(result.current.assignments).toEqual({ 1: "MILLA", 8: "MICHEL" });
   });
 });

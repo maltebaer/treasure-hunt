@@ -17,27 +17,27 @@ export type Station = {
 };
 
 export const CHILDREN = [
-  "Finja",
-  "Lina",
-  "Friedi",
-  "Fiete",
-  "Esmee",
-  "Ronja",
-  "Milla",
-  "Michel",
+  "FINJA",
+  "LINA",
+  "FRIEDI",
+  "FIETE",
+  "ESMEE",
+  "RONJA",
+  "MILLA",
+  "MICHEL",
 ] as const;
 
 export type ChildName = (typeof CHILDREN)[number];
 
 export const FIXED_ASSIGNMENTS: Record<ChildName, number | null> = {
-  Finja: null,
-  Lina: null,
-  Friedi: null,
-  Fiete: null,
-  Esmee: null,
-  Ronja: null,
-  Milla: 1,
-  Michel: 8,
+  FINJA: null,
+  LINA: null,
+  FRIEDI: null,
+  FIETE: null,
+  ESMEE: null,
+  RONJA: null,
+  MILLA: 1,
+  MICHEL: 8,
 };
 
 export const STATIONS: Station[] = [
